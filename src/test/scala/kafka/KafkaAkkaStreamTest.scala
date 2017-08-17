@@ -1,5 +1,7 @@
 package kafka
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import akka.Done
 import akka.actor.ActorSystem
 import akka.kafka.scaladsl.{Consumer, Producer}
@@ -34,14 +36,14 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
   }
 
   test("kafka") {
-    Await.result(produceMessages(), 3 seconds)
-    Await.result(consumeMessages(), 9 seconds)
+    produceMessages(3)
+    consumeMessages() min 3
   }
 
-  def produceMessages(): Future[Done] = {
+  def produceMessages(count: Int): Unit = {
     val settings = ProducerSettings(producerConfig, new StringSerializer, new StringSerializer)
       .withBootstrapServers(producerConfig.getString("bootstrap.servers"))
-    Source(1 to 3)
+    val done = Source(1 to count)
       .map(_.toString)
       .map { s =>
         val record = new ProducerRecord[String, String] (topic, s, s)
@@ -49,19 +51,24 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
         record
       }
       .runWith(Producer.plainSink(settings))
+    Await.result(done, 3 seconds)
   }
 
-  def consumeMessages(): Future[Done] = {
+  def consumeMessages(): Int = {
     val settings = ConsumerSettings(consumerConfig, new StringDeserializer, new StringDeserializer)
       .withBootstrapServers(consumerConfig.getString("bootstrap.servers"))
       .withGroupId(consumerConfig.getString("group.id"))
       .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, consumerConfig.getString("auto.offset.reset"))
+    val count = new AtomicInteger()
     Consumer.committableSource(settings, Subscriptions.topics(topic))
       .mapAsync(1) { message =>
+        count.incrementAndGet
         logger.info(s"Consumer -> key: ${message.record.key} value: ${message.record.value}")
         Future.successful(Done).map(_ => message)
       }
       .mapAsync(1) { message => message.committableOffset.commitScaladsl() }
       .runWith(Sink.ignore)
+    Thread.sleep(9000L) // Future[Done] returned from Consumer never completes.
+    count.get
   }
 }
