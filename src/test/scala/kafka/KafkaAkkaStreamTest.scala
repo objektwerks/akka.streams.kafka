@@ -8,6 +8,7 @@ import akka.stream.Supervision.Decider
 import akka.stream.scaladsl.{Sink, Source}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Supervision}
 import com.typesafe.config.ConfigFactory
+import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -52,8 +53,9 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
 
   def consumeMessages(): Future[Done] = {
     val settings = ConsumerSettings(consumerConfig, new StringDeserializer, new StringDeserializer)
-      .withGroupId(consumerConfig.getString("group.id"))
       .withBootstrapServers(consumerConfig.getString("bootstrap.servers"))
+      .withGroupId(consumerConfig.getString("group.id"))
+      .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, consumerConfig.getString("auto.offset.reset"))
     Consumer.committableSource(settings, Subscriptions.topics(topic))
       .mapAsync(1) { message =>
         logger.info(s"Consumer -> key: ${message.record.key} value: ${message.record.value}")
