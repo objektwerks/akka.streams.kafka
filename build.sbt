@@ -1,7 +1,7 @@
 name := "kafka.akka.streams"
 organization := "objektwerks"
 version := "0.1-SNAPSHOT"
-scalaVersion := "2.12.5"
+scalaVersion := "2.12.6"
 libraryDependencies ++= {
   val akkaVersion = "2.5.12"
   Seq(
