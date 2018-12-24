@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
+import scala.language.postfixOps
 
 class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers {
   val logger = LoggerFactory.getLogger(this.getClass.getSimpleName)
@@ -33,6 +34,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
 
   override protected def afterAll(): Unit = {
     Await.result(system.terminate(), 1 second)
+    ()
   }
 
   test("kafka") {
@@ -52,6 +54,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
       }
       .runWith(Producer.plainSink(settings))
     Await.result(done, 3 seconds)
+    ()
   }
 
   def consumeMessages(): Int = {
