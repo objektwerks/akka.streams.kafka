@@ -50,7 +50,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
   }
 
   def produceMessages(count: Int): Unit = {
-    val producerSettings = ProducerSettings(producerConfig, new StringSerializer, new StringSerializer)
+    val producerSettings = ProducerSettings[String, String](producerConfig, new StringSerializer, new StringSerializer)
       .withBootstrapServers(producerConfig.getString("bootstrap.servers"))
 
     val done = Source(1 to count)
@@ -66,7 +66,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
   }
 
   def consumeMessages(): Unit = {
-    val consumerSettings = ConsumerSettings(consumerConfig, new StringDeserializer, new StringDeserializer)
+    val consumerSettings = ConsumerSettings[String, String](consumerConfig, new StringDeserializer, new StringDeserializer)
       .withBootstrapServers(consumerConfig.getString("bootstrap.servers"))
       .withGroupId(consumerConfig.getString("group.id"))
       .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, consumerConfig.getString("auto.offset.reset"))
