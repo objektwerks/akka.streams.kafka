@@ -43,7 +43,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
   val committerSettings = CommitterSettings(system)
 
   override protected def afterAll(): Unit = {
-    Await.result(system.terminate(), 1 second)
+    Await.result(system.terminate, 3 seconds)
     ()
   }
 
@@ -75,8 +75,8 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
       }
       .toMat(Committer.sink(committerSettings))(Keep.both)
       .mapMaterializedValue(DrainingControl.apply)
-      .run()
-    val done = control.drainAndShutdown
+      .run
+    val done = control.shutdown
     Await.result(done, 3 seconds)
     count.get
   }
