@@ -57,7 +57,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
       .map(_.toString)
       .map { string =>
         val record = new ProducerRecord[String, String] (topic, string, string)
-        logger.info(s"Producer -> topic: $topic key: ${record.key} value: ${record.value}")
+        logger.info(s"*** Producer -> topic: $topic key: ${record.key} value: ${record.value}")
         record
       }
       .runWith(Producer.plainSink(producerSettings))
@@ -69,10 +69,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
     val count = new AtomicInteger()
     val control: DrainingControl[Done] = Consumer
       .committableSource(consumerSettings, Subscriptions.topics(topic))
-      .mapAsync(parallelism = 1) { message =>
-        count.incrementAndGet
-        consumeMessage(message).map(_ => message.committableOffset)
-      }
+      .mapAsync(parallelism = 1) { message => consumeMessage(message, count).map(_ => message.committableOffset) }
       .toMat(Committer.sink(committerSettings))(Keep.both)
       .mapMaterializedValue(DrainingControl.apply)
       .run
@@ -81,9 +78,10 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
     count.get
   }
 
-  def consumeMessage(message: CommittableMessage[String, String]): Future[Done] = {
+  def consumeMessage(message: CommittableMessage[String, String], count: AtomicInteger): Future[Done] = {
     val record = message.record
-    logger.info(s"Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
+    logger.info(s"*** Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
+    count.incrementAndGet
     Future.successful(Done)
   }
 }
