@@ -4,6 +4,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import akka.Done
 import akka.actor.ActorSystem
+import akka.kafka.ConsumerMessage.CommittableMessage
 import akka.kafka.scaladsl.Consumer.DrainingControl
 import akka.kafka.scaladsl.{Committer, Consumer, Producer}
 import akka.kafka.{CommitterSettings, ConsumerSettings, ProducerSettings, Subscriptions}
@@ -40,6 +41,8 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
     .withGroupId(consumerConfig.getString("group.id"))
     .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, consumerConfig.getString("auto.offset.reset"))
 
+  val committerSettings = CommitterSettings(system)
+
   override protected def afterAll(): Unit = {
     Await.result(system.terminate(), 1 second)
     ()
@@ -64,16 +67,12 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
   }
 
   def consumeMessages(): Int = {
-    val committerSettings = CommitterSettings(system)
     val count = new AtomicInteger()
     val control: DrainingControl[Done] = Consumer
       .committableSource(consumerSettings, Subscriptions.topics(topic))
       .mapAsync(parallelism = 1) { message =>
-        Future {
-          val record = message.record
-          logger.info(s"Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
-          count.incrementAndGet
-        }.map(_ => message.committableOffset)
+        count.incrementAndGet
+        consumeMessage(message).map(_ => message.committableOffset)
       }
       .toMat(Committer.sink(committerSettings))(Keep.both)
       .mapMaterializedValue(DrainingControl.apply)
@@ -81,5 +80,11 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
     val done = control.drainAndShutdown
     Await.result(done, 3 seconds)
     count.get
+  }
+
+  def consumeMessage(message: CommittableMessage[String, String]): Future[Done] = {
+    val record = message.record
+    logger.info(s"Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
+    Future.successful(Done)
   }
 }
