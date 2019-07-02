@@ -4,10 +4,11 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import akka.Done
 import akka.actor.ActorSystem
-import akka.kafka.scaladsl.{Consumer, Producer}
-import akka.kafka.{ConsumerSettings, ProducerSettings, Subscriptions}
+import akka.kafka.scaladsl.Consumer.DrainingControl
+import akka.kafka.scaladsl.{Committer, Consumer, Producer}
+import akka.kafka.{CommitterSettings, ConsumerSettings, ProducerSettings, Subscriptions}
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Sink, Source}
+import akka.stream.scaladsl.{Keep, Source}
 import com.typesafe.config.ConfigFactory
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -54,7 +55,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
       .map(_.toString)
       .map { string =>
         val record = new ProducerRecord[String, String] (topic, string, string)
-        logger.info(s"Producer -> key: ${record.key} value: ${record.value}")
+        logger.info(s"Producer -> topic: $topic key: ${record.key} value: ${record.value}")
         record
       }
       .runWith(Producer.plainSink(producerSettings))
@@ -63,17 +64,21 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
   }
 
   def consumeMessages(): Int = {
+    val committerSettings = CommitterSettings(system)
     val count = new AtomicInteger()
-    val done = Consumer
+    val control: DrainingControl[Done] = Consumer
       .committableSource(consumerSettings, Subscriptions.topics(topic))
       .mapAsync(parallelism = 1) { message =>
-        val record = message.record
-        count.incrementAndGet
-        logger.info(s"Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
-        Future.successful(Done).map(_ => message)
+        Future {
+          val record = message.record
+          logger.info(s"Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
+          count.incrementAndGet
+        }.map(_ => message.committableOffset)
       }
-      .mapAsync(parallelism = 1) { message => message.committableOffset.commitScaladsl() }
-      .runWith(Sink.ignore)
+      .toMat(Committer.sink(committerSettings))(Keep.both)
+      .mapMaterializedValue(DrainingControl.apply)
+      .run()
+    val done = control.drainAndShutdown
     Await.result(done, 3 seconds)
     count.get
   }
