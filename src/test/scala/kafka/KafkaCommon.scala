@@ -23,7 +23,7 @@ object KafkaCommon {
   }
 
   def assertTopic(topic: String): Boolean = {
-    val adminClient: AdminClient = AdminClient.create(adminClientProperties)
+    val adminClient = AdminClient.create(adminClientProperties)
     val newTopic = new NewTopic(topic, 1, 1.toShort)
     val createTopicResult = adminClient.createTopics(List(newTopic).asJavaCollection)
     createTopicResult.values().containsKey(topic)
