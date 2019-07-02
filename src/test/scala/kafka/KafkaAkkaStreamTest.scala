@@ -49,7 +49,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
 
   test("kafka") {
     produceMessages(3)
-    consumeMessages() min 3
+    consumeMessages() should be >= 3
   }
 
   def produceMessages(count: Int): Unit = {
