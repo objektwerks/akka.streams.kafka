@@ -1,8 +1,7 @@
-Kafka
------
->The purpose of this project is to test Kafka features.
-
-***
+Kafka Akka Streams
+------------------
+>The purpose of this project is to test Akka Streams Kafka connnector features.
+>**WARNING** Unable to get Akka Streams Kafka Consumer to commit offsets!
 
 Homebrew
 --------
