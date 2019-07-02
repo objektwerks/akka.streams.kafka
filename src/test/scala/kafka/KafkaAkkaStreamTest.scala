@@ -78,10 +78,10 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
     count.get
   }
 
-  def consumeMessage(message: CommittableMessage[String, String], count: AtomicInteger): Future[Done] = {
+  def consumeMessage(message: CommittableMessage[String, String], count: AtomicInteger): Future[Done] = Future[Done] {
     val record = message.record
     logger.info(s"*** Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
     count.incrementAndGet
-    Future.successful(Done)
+    Done
   }
 }
