@@ -63,7 +63,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
   }
 
   def consumeMessages(): Unit = {
-    val control: DrainingControl[Done] = Consumer
+    val done = Consumer
       .committableSource(consumerSettings, Subscriptions.topics(topic))
       .mapAsync(parallelism = 1) { message =>
         Future.successful(Done).map(_ => message.committableOffset)
@@ -71,7 +71,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
       .toMat(Committer.sink(committerSettings))(Keep.both)
       .mapMaterializedValue(DrainingControl.apply)
       .run
-    val done = control.drainAndShutdown
+      .drainAndShutdown
     Await.result(done, 3 seconds)
     ()
   }
