@@ -1,5 +1,9 @@
 package kafka
 
+import java.time.Duration
+import java.util.Properties
+import java.util.concurrent.atomic.AtomicInteger
+
 import akka.Done
 import akka.actor.ActorSystem
 import akka.kafka.scaladsl.Consumer.DrainingControl
@@ -8,7 +12,7 @@ import akka.kafka.{CommitterSettings, ConsumerSettings, ProducerSettings, Subscr
 import akka.stream.ActorMaterializer
 import akka.stream.scaladsl.{Keep, Source}
 import com.typesafe.config.ConfigFactory
-import org.apache.kafka.clients.consumer.ConsumerConfig
+import org.apache.kafka.clients.consumer.{ConsumerConfig, KafkaConsumer}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -16,6 +20,7 @@ import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
+import scala.collection.JavaConverters._
 
 class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers {
   val config = ConfigFactory.load("test.conf")
@@ -28,6 +33,8 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
   implicit val logger = system.log
 
   val topic = "kv"
+
+  val kafkaConsumerProperties = loadProperties("/kafka-consumer.properties")
 
   val producerSettings = ProducerSettings(producerConfig, new StringSerializer, new StringSerializer)
     .withBootstrapServers(producerConfig.getString("bootstrap.servers"))
@@ -46,7 +53,13 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
 
   test("kafka") {
     produceMessages(3)
-    consumeMessages() // How to pre- and post-verify topic offset?
+    val postProduceMessageCount = countMessages(3)
+
+    consumeMessages()
+    val postConsumeMessageCount = countMessages(3)
+
+    postProduceMessageCount should be >= 3
+    postConsumeMessageCount shouldEqual 0
   }
 
   def produceMessages(count: Int): Unit = {
@@ -65,7 +78,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
   def consumeMessages(): Unit = {
     val done = Consumer
       .committableSource(consumerSettings, Subscriptions.topics(topic))
-      .mapAsync(parallelism = 1) { message =>
+      .mapAsync(parallelism = 4) { message =>
         Future.successful(Done).map(_ => message.committableOffset)
       }
       .toMat(Committer.sink(committerSettings))(Keep.both)
@@ -74,5 +87,28 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
       .drainAndShutdown
     Await.result(done, 3 seconds)
     ()
+  }
+
+  def countMessages(retries: Int): Int = {
+    val consumer = new KafkaConsumer[String, String](kafkaConsumerProperties)
+    consumer.subscribe(List(topic).asJava)
+    val count = new AtomicInteger()
+    for (i <- 1 to retries) {
+      val records = consumer.poll(Duration.ofMillis(100L))
+      logger.info(s"*** Consumer -> { ${records.count} } records polled on attempt { $i }.")
+      records.iterator.asScala.foreach { record =>
+        logger.info(s"*** Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
+        count.incrementAndGet()
+      }
+    }
+    consumer.close()
+    logger.info(s"*** Consumer -> count is ${count.get}")
+    count.get
+  }
+
+  def loadProperties(file: String): Properties = {
+    val properties = new Properties()
+    properties.load(scala.io.Source.fromInputStream(getClass.getResourceAsStream(file)).bufferedReader())
+    properties
   }
 }
