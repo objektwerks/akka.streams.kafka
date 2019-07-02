@@ -31,16 +31,6 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
 
   val topic = "kv"
 
-  val producerSettings = ProducerSettings(producerConfig, new StringSerializer, new StringSerializer)
-    .withBootstrapServers(producerConfig.getString("bootstrap.servers"))
-
-  val consumerSettings = ConsumerSettings(consumerConfig, new StringDeserializer, new StringDeserializer)
-    .withBootstrapServers(consumerConfig.getString("bootstrap.servers"))
-    .withGroupId(consumerConfig.getString("group.id"))
-    .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, consumerConfig.getString("auto.offset.reset"))
-
-  val committerSettings = CommitterSettings(committerConfig)
-
   override protected def afterAll(): Unit = {
     Await.result(system.terminate, 3 seconds)
     ()
@@ -60,6 +50,9 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
   }
 
   def produceMessages(count: Int): Unit = {
+    val producerSettings = ProducerSettings(producerConfig, new StringSerializer, new StringSerializer)
+      .withBootstrapServers(producerConfig.getString("bootstrap.servers"))
+
     val done = Source(1 to count)
       .map(_.toString)
       .map { string =>
@@ -73,6 +66,13 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
   }
 
   def consumeMessages(): Unit = {
+    val consumerSettings = ConsumerSettings(consumerConfig, new StringDeserializer, new StringDeserializer)
+      .withBootstrapServers(consumerConfig.getString("bootstrap.servers"))
+      .withGroupId(consumerConfig.getString("group.id"))
+      .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, consumerConfig.getString("auto.offset.reset"))
+
+    val committerSettings = CommitterSettings(committerConfig)
+
     val control = Consumer
       .committableSource(consumerSettings, Subscriptions.topics(Set(topic)))
       .mapAsync(parallelism = 4) { message => Future(message.committableOffset) }
