@@ -77,7 +77,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
 
   def consumeMessages(): Unit = {
     val done = Consumer
-      .committableSource(consumerSettings, Subscriptions.topics(topic))
+      .committableSource(consumerSettings, Subscriptions.topics(Set(topic)))
       .mapAsync(parallelism = 4) { message => Future.successful(message.committableOffset) }
       .toMat(Committer.sink(committerSettings))(Keep.both)
       .mapMaterializedValue(DrainingControl.apply)
