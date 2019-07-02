@@ -73,7 +73,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
       .toMat(Committer.sink(committerSettings))(Keep.both)
       .mapMaterializedValue(DrainingControl.apply)
       .run
-    val done = control.shutdown
+    val done = control.drainAndShutdown
     Await.result(done, 3 seconds)
     count.get
   }
