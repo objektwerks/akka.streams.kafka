@@ -15,14 +15,12 @@ import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
-import org.slf4j.LoggerFactory
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
 class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers {
-  val logger = LoggerFactory.getLogger(this.getClass.getSimpleName)
   val config = ConfigFactory.load("test.conf")
   val producerConfig = config.getConfig("akka.kafka.producer")
   val consumerConfig = config.getConfig("akka.kafka.consumer")
@@ -30,6 +28,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
   implicit val system = ActorSystem.create("kafka-akka-stream", config)
   implicit val materializer = ActorMaterializer()
   implicit val dispatcher = system.dispatcher
+  implicit val logger = system.log
 
   val topic = "kv"
 
