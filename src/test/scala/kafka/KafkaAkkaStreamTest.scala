@@ -4,7 +4,6 @@ import java.time.Duration
 import java.util.Properties
 import java.util.concurrent.atomic.AtomicInteger
 
-import akka.Done
 import akka.actor.ActorSystem
 import akka.kafka.scaladsl.Consumer.DrainingControl
 import akka.kafka.scaladsl.{Committer, Consumer, Producer}
@@ -78,9 +77,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
   def consumeMessages(): Unit = {
     val done = Consumer
       .committableSource(consumerSettings, Subscriptions.topics(topic))
-      .mapAsync(parallelism = 4) { message =>
-        Future.successful(Done).map(_ => message.committableOffset)
-      }
+      .mapAsync(parallelism = 4) { message => Future.successful(message.committableOffset) }
       .toMat(Committer.sink(committerSettings))(Keep.both)
       .mapMaterializedValue(DrainingControl.apply)
       .run
