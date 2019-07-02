@@ -25,6 +25,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
   val config = ConfigFactory.load("test.conf")
   val producerConfig = config.getConfig("akka.kafka.producer")
   val consumerConfig = config.getConfig("akka.kafka.consumer")
+  val committerConfig = config.getConfig("akka.kafka.committer")
 
   implicit val system = ActorSystem.create("kafka-akka-stream", config)
   implicit val materializer = ActorMaterializer()
@@ -43,7 +44,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
     .withGroupId(consumerConfig.getString("group.id"))
     .withProperty(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, consumerConfig.getString("auto.offset.reset"))
 
-  val committerSettings = CommitterSettings(system)
+  val committerSettings = CommitterSettings(committerConfig)
 
   override protected def afterAll(): Unit = {
     Await.result(system.terminate, 3 seconds)
