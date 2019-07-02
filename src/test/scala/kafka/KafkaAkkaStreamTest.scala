@@ -46,7 +46,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
     ()
   }
 
-  test("kafka") {
+  test("producer -> consumer") {
     assertTopic(topic) shouldBe true
 
     produceMessages(3)
