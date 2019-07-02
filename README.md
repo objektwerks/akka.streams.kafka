@@ -6,13 +6,13 @@ Kafka
 
 Homebrew
 --------
->Install Homebrew on OSX. [How-To] (http://coolestguidesontheplanet.com/installing-homebrew-os-x-yosemite-10-10-package-manager-unix-apps/)
+>Install Homebrew on OSX.
 
 Installation
 ------------
 >Install the following packages via Homebrew:
 
-1. brew tap homebrew/services [Homebrew Services] (https://robots.thoughtbot.com/starting-and-stopping-background-services-with-homebrew)
+1. brew tap homebrew/services
 2. brew install scala
 3. brew install sbt
 4. brew install zookeeper

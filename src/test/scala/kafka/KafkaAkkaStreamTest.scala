@@ -30,7 +30,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
   val decider: Decider = Supervision.restartingDecider
   val settings = ActorMaterializerSettings(system).withSupervisionStrategy(decider)
   implicit val materializer = ActorMaterializer(settings)
-  val topic = "cake-stream"
+  val topic = "kv"
 
   override protected def afterAll(): Unit = {
     Await.result(system.terminate(), 1 second)
