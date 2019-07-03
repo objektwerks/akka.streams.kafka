@@ -29,11 +29,11 @@ object KafkaCommon {
     createTopicResult.values().containsKey(topic)
   }
 
-  def countMessages(topic: String, retries: Int)(implicit logger: LoggingAdapter): Int = {
+  def countMessages(topic: String)(implicit logger: LoggingAdapter): Int = {
     val consumer = new KafkaConsumer[String, String](kafkaConsumerProperties)
     consumer.subscribe(List(topic).asJava)
     val count = new AtomicInteger()
-    for (i <- 1 to retries) {
+    for (i <- 1 to 2) {
       val records = consumer.poll(Duration.ofMillis(100L))
       logger.info(s"*** Consumer -> { ${records.count} } records polled on attempt { $i }.")
       records.iterator.asScala.foreach { record =>
@@ -42,7 +42,7 @@ object KafkaCommon {
       }
     }
     consumer.close()
-    logger.info(s"*** Consumer -> count is ${count.get}")
+    logger.info(s"*** Consumer -> record count is ${count.get}")
     count.get
   }
 }

@@ -40,10 +40,10 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
     assertTopic(topic) shouldBe true
 
     produceMessages(3)
-    val postProduceMessageCount = countMessages(topic, 2)
+    val postProduceMessageCount = countMessages(topic)
 
     consumeMessages()
-    val postConsumeMessageCount = countMessages(topic, 2)
+    val postConsumeMessageCount = countMessages(topic)
 
     postProduceMessageCount should be >= 3
     postConsumeMessageCount shouldEqual 0
