@@ -35,14 +35,14 @@ object KafkaCommon {
     val count = new AtomicInteger()
     for (i <- 1 to 2) {
       val records = consumer.poll(Duration.ofMillis(100L))
-      logger.info(s"*** Consumer -> { ${records.count} } records polled on attempt { $i }.")
+      logger.info(s"**** Consumer -> { ${records.count} } records polled on attempt { $i }.")
       records.iterator.asScala.foreach { record =>
-        logger.info(s"*** Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
+        logger.info(s"**** Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
         count.incrementAndGet()
       }
     }
     consumer.close()
-    logger.info(s"*** Consumer -> record count is ${count.get}")
+    logger.info(s"**** Consumer -> record count is ${count.get}")
     count.get
   }
 }

@@ -12,8 +12,8 @@ import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
+import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.concurrent.{Await, Future}
 import scala.language.postfixOps
 
 class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers {
@@ -75,11 +75,15 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
 
     val control = Consumer
       .committableSource(consumerSettings, Subscriptions.topics(topic))
-      .mapAsync(parallelism = 1) { message => Future(message.committableOffset) }
+      .map { message =>
+        val record = message.record
+        logger.info(s"*** Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
+        message.committableOffset
+      }
       .toMat(Committer.sink(committerSettings))(Keep.both)
       .mapMaterializedValue(DrainingControl.apply)
       .run
-    Await.result(control.drainAndShutdown, 3 seconds)
+    Await.result(control.drainAndShutdown, 9 seconds)
     ()
   }
 }
