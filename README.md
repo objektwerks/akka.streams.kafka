@@ -18,6 +18,13 @@ Installation
 4. brew install zookeeper
 5. brew install kafka
 
+Kafka
+-----
+>You may have to set these Kafka server properties ( /usr/local/etc/kafka/server.properties ):
+
+1. listeners=PLAINTEXT://0.0.0.0:9092
+2. advertised.listeners=PLAINTEXT://127.0.0.1:9092
+
 Service
 -------
 >Start:
