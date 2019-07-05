@@ -1,10 +1,10 @@
 package kafka
 
 import akka.actor.ActorSystem
-import akka.kafka.Subscriptions
 import akka.kafka.scaladsl.{Committer, Consumer, Producer}
-import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.{Keep, Source}
+import akka.stream.scaladsl.{Flow, GraphDSL, Keep, RunnableGraph, Sink, Source}
+import akka.stream.{ActorMaterializer, ClosedShape}
+import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
 
@@ -40,6 +40,10 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
     postConsumeMessageCount shouldEqual 0
   }
 
+  test("producer-consumer-graph") {
+    pruduceConsumeMessagesViaGraph(3)
+  }
+
   def produceMessages(count: Int): Unit = {
     val done = Source(1 to count)
       .map(_.toString)
@@ -55,7 +59,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
 
   def consumeMessages(): Unit = {
     val done = Consumer
-      .committableSource(consumerSettings, Subscriptions.topics(topic))
+      .committableSource(consumerSettings, subscriptions)
       .map { message =>
         val record = message.record
         logger.info(s"*** Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
@@ -66,5 +70,26 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
       .run
     Try(Await.result(done, 3 seconds)) // Future[Done] never completes, so times out. But messages are consumed and offsets committed.
     ()
+  }
+
+  def pruduceConsumeMessagesViaGraph(count: Int): Unit = {
+    val runnableGraph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
+      import GraphDSL.Implicits._
+
+      val recordSource = Source(1 to count).map(_.toString)
+      val kafkaSource = Consumer.plainSource(consumerSettings, subscriptions)
+
+      val producerRecordFlow = Flow[String].map(string => new ProducerRecord[String, String](topic, string, string))
+      val consumerRecordFlow = Flow[ConsumerRecord[String, String]].map(record => record.value())
+
+      val kafkaSink = Producer.plainSink(producerSettings)
+      val printlnSink = Sink.foreach(println)
+
+      recordSource  ~> producerRecordFlow ~> kafkaSink
+      kafkaSource ~> consumerRecordFlow ~> printlnSink
+
+      ClosedShape
+    })
+    runnableGraph.run
   }
 }
