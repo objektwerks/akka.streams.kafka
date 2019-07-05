@@ -62,9 +62,11 @@ class KafkaAkkaStreamsTest extends FunSuite with BeforeAndAfterAll with Matchers
         message.committableOffset
       }
       .toMat(Committer.sink(committerSettings))(Keep.right)
-      // .mapMaterializedValue(DrainingControl.apply) // Somehow prevents message consume and commit ( with Keep.both above )
+      // .mapMaterializedValue(DrainingControl.apply)
+      // Somehow prevents message consume and offset commit ( with Keep.both set above )
       .run
-    Try(Await.result(done, 3 seconds)) // Future[Done] never completes, so times out. But messages are consumed and offsets committed.
+    Try(Await.result(done, 3 seconds))
+    // Future[Done] never completes, so it times out. But messages are consumed and offsets committed.
     ()
   }
 
