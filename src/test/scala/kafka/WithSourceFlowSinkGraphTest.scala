@@ -28,15 +28,15 @@ class WithSourceFlowSinkGraphTest extends FunSuite with BeforeAndAfterAll with M
 
   test("with source -> flow -> sink graph") {
     assertTopic(topic) shouldBe true
-    withSourceFlowSinkGraph(3)
+    withSourceFlowSinkGraph()
     countMessages(topic) shouldEqual 0
   }
 
-  def withSourceFlowSinkGraph(count: Int): Unit = {
+  def withSourceFlowSinkGraph(): Unit = {
     val runnableGraph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
       import GraphDSL.Implicits._
 
-      val recordSource = Source(1 to count).map(_.toString)
+      val recordSource = Source(7 to 9).map(_.toString)
       val producerRecordFlow = Flow[String].map { string =>
         val record = new ProducerRecord[String, String](topic, string, string)
         logger.info(s"*** Producer -> topic: $topic key: ${record.key} value: ${record.value}")

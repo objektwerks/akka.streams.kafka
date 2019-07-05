@@ -29,7 +29,7 @@ class WithProducerConsumerTest extends FunSuite with BeforeAndAfterAll with Matc
   test("with producer -> consumer") {
     assertTopic(topic) shouldBe true
 
-    produceMessages(3)
+    produceMessages()
     val postProduceMessageCount = countMessages(topic)
 
     consumeMessages()
@@ -39,8 +39,8 @@ class WithProducerConsumerTest extends FunSuite with BeforeAndAfterAll with Matc
     postConsumeMessageCount shouldEqual 0
   }
 
-  def produceMessages(count: Int): Unit = {
-    val done = Source(1 to count)
+  def produceMessages(): Unit = {
+    val done = Source(1 to 3)
       .map(_.toString)
       .map { string =>
         val record = new ProducerRecord[String, String] (topic, string, string)

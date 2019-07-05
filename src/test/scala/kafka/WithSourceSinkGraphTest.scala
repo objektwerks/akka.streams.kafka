@@ -27,15 +27,15 @@ class WithSourceSinkGraphTest extends FunSuite with BeforeAndAfterAll with Match
 
   test("with source -> sink graph") {
     assertTopic(topic) shouldBe true
-    withSourceSinkGraph(3)
+    withSourceSinkGraph()
     countMessages(topic) shouldEqual 0
   }
 
-  def withSourceSinkGraph(count: Int): Unit = {
+  def withSourceSinkGraph(): Unit = {
     val runnableGraph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
       import GraphDSL.Implicits._
 
-      val recordSource = Source(1 to count)
+      val recordSource = Source(4 to 6)
         .map(_.toString)
         .map { string =>
           val record = new ProducerRecord[String, String](topic, string, string)
