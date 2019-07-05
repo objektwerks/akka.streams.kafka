@@ -41,7 +41,9 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
   }
 
   test("producer-consumer-graph") {
+    assertTopic(topic) shouldBe true
     pruduceConsumeMessagesViaGraph(3)
+    countMessages(topic) shouldEqual 0
   }
 
   def produceMessages(count: Int): Unit = {
@@ -77,12 +79,18 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
       import GraphDSL.Implicits._
 
       val recordSource = Source(1 to count).map(_.toString)
-      val kafkaSource = Consumer.plainSource(consumerSettings, subscriptions)
-
-      val producerRecordFlow = Flow[String].map(string => new ProducerRecord[String, String](topic, string, string))
-      val consumerRecordFlow = Flow[ConsumerRecord[String, String]].map(record => record.value())
-
+      val producerRecordFlow = Flow[String].map { string =>
+        val record = new ProducerRecord[String, String](topic, string, string)
+        logger.info(s"*** Producer -> topic: $topic key: ${record.key} value: ${record.value}")
+        record
+      }
       val kafkaSink = Producer.plainSink(producerSettings)
+
+      val kafkaSource = Consumer.plainSource(consumerSettings, subscriptions)
+      val consumerRecordFlow = Flow[ConsumerRecord[String, String]].map { record =>
+        logger.info(s"*** Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
+        record.toString
+      }
       val printlnSink = Sink.foreach(println)
 
       recordSource  ~> producerRecordFlow ~> kafkaSink
@@ -91,5 +99,6 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
       ClosedShape
     })
     runnableGraph.run
+    ()
   }
 }
