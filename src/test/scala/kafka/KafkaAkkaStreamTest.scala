@@ -42,7 +42,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
 
   test("with source -> sink graph") {
     assertTopic(topic) shouldBe true
-    withSouceSinkGraph(3)
+    withSourceSinkGraph(3)
     countMessages(topic) shouldEqual 0
   }
 
@@ -80,7 +80,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
     ()
   }
 
-  def withSouceSinkGraph(count: Int): Unit = {
+  def withSourceSinkGraph(count: Int): Unit = {
     val runnableGraph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
       import GraphDSL.Implicits._
 
@@ -100,10 +100,10 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
           logger.info(s"*** Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
           message.committableOffset
         }
-      val committerSink = Committer.sink(committerSettings)(Keep.right)
+      val committerSink = Committer.sink(committerSettings)
 
       recordSource ~> kafkaSink
-      kafkaSource.toMat(committerSink)
+      kafkaSource.toMat(committerSink)(Keep.right)
 
       ClosedShape
     })
