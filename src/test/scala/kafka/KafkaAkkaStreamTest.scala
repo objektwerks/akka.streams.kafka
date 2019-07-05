@@ -40,9 +40,9 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
     postConsumeMessageCount shouldEqual 0
   }
 
-  test("producer-consumer-graph") {
+  test("runnable graph") {
     assertTopic(topic) shouldBe true
-    pruduceConsumeMessagesViaGraph(3)
+    produceConsumeMessagesWithRunnableGraph(3)
     countMessages(topic) shouldEqual 0
   }
 
@@ -74,7 +74,7 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
     ()
   }
 
-  def pruduceConsumeMessagesViaGraph(count: Int): Unit = {
+  def produceConsumeMessagesWithRunnableGraph(count: Int): Unit = {
     val runnableGraph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
       import GraphDSL.Implicits._
 
