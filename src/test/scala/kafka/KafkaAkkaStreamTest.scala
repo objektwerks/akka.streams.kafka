@@ -40,9 +40,15 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
     postConsumeMessageCount shouldEqual 0
   }
 
-  test("runnable graph") {
+  test("with source -> sink graph") {
     assertTopic(topic) shouldBe true
-    produceConsumeMessagesWithRunnableGraph(3)
+    withSouceSinkGraph(3)
+    countMessages(topic) shouldEqual 0
+  }
+
+  test("with source -> flow -> sink graph") {
+    assertTopic(topic) shouldBe true
+    withSourceFlowSinkGraph(3)
     countMessages(topic) shouldEqual 0
   }
 
@@ -74,7 +80,38 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
     ()
   }
 
-  def produceConsumeMessagesWithRunnableGraph(count: Int): Unit = {
+  def withSouceSinkGraph(count: Int): Unit = {
+    val runnableGraph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
+      import GraphDSL.Implicits._
+
+      val recordSource = Source(1 to count)
+        .map(_.toString)
+        .map { string =>
+          val record = new ProducerRecord[String, String](topic, string, string)
+          logger.info(s"*** Producer -> topic: $topic key: ${record.key} value: ${record.value}")
+          record
+        }
+      val kafkaSink = Producer.plainSink(producerSettings)
+
+      val kafkaSource = Consumer
+        .committableSource(consumerSettings, subscriptions)
+        .map { message =>
+          val record = message.record
+          logger.info(s"*** Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
+          message.committableOffset
+        }
+      val committerSink = Committer.sink(committerSettings)(Keep.right)
+
+      recordSource ~> kafkaSink
+      kafkaSource.toMat(committerSink)
+
+      ClosedShape
+    })
+    runnableGraph.run
+    ()
+  }
+
+  def withSourceFlowSinkGraph(count: Int): Unit = {
     val runnableGraph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
       import GraphDSL.Implicits._
 
@@ -91,10 +128,10 @@ class KafkaAkkaStreamTest extends FunSuite with BeforeAndAfterAll with Matchers 
         logger.info(s"*** Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
         record.toString
       }
-      val printlnSink = Sink.foreach(println)
+      val ignoreSink = Sink.ignore
 
       recordSource  ~> producerRecordFlow ~> kafkaSink
-      kafkaSource ~> consumerRecordFlow ~> printlnSink
+      kafkaSource ~> consumerRecordFlow ~> ignoreSink
 
       ClosedShape
     })
