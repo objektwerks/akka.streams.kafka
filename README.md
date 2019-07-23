@@ -2,8 +2,6 @@ Kafka Akka Streams
 ------------------
 >The purpose of this project is to test Akka Streams Alpakka Kafka connnector features.
 
->**WARNING** Unable to get Alpakka Kafka connector to consume and commit offsets!
-
 Homebrew
 --------
 >Install Homebrew on OSX.
