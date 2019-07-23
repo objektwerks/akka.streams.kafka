@@ -10,7 +10,7 @@ import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializ
 
 import scala.io.Source
 
-object TestConf {
+object Conf {
   val config = ConfigFactory.load("test.conf")
   val producerConfig = config.getConfig("akka.kafka.producer")
   val consumerConfig = config.getConfig("akka.kafka.consumer")

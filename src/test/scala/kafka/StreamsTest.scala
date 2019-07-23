@@ -4,7 +4,6 @@ import akka.actor.ActorSystem
 import akka.kafka.scaladsl.{Committer, Consumer, Producer}
 import akka.stream.{ActorMaterializer, ClosedShape}
 import akka.stream.scaladsl.{Flow, GraphDSL, Keep, RunnableGraph, Sink, Source}
-import kafka.KafkaCommon.{assertTopic, countMessages}
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
@@ -14,8 +13,9 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.util.Try
 
-class KafkaAkkaStreamsTest extends FunSuite with BeforeAndAfterAll with Matchers {
-  import TestConf._
+class StreamsTest extends FunSuite with BeforeAndAfterAll with Matchers {
+  import Conf._
+  import Common._
 
   implicit val system = ActorSystem.create("kafka-akka-streams-test", config)
   implicit val materializer = ActorMaterializer()
@@ -28,7 +28,7 @@ class KafkaAkkaStreamsTest extends FunSuite with BeforeAndAfterAll with Matchers
   }
 
   test("producer -> consumer") {
-    assertTopic(topic) shouldBe true
+    createTopic(topic) shouldBe true
 
     produceMessages()
     val postProduceMessageCount = countMessages(topic)
@@ -38,6 +38,18 @@ class KafkaAkkaStreamsTest extends FunSuite with BeforeAndAfterAll with Matchers
 
     postProduceMessageCount should be >= 3
     postConsumeMessageCount shouldEqual 0
+  }
+
+  test("source -> sink graph") {
+    createTopic(topic) shouldBe true
+    withSourceSinkGraph()
+    countMessages(topic) shouldEqual 0
+  }
+
+  test("source -> flow -> sink graph") {
+    createTopic(topic) shouldBe true
+    withSourceFlowSinkGraph()
+    countMessages(topic) shouldEqual 0
   }
 
   def produceMessages(): Unit = {
@@ -70,12 +82,6 @@ class KafkaAkkaStreamsTest extends FunSuite with BeforeAndAfterAll with Matchers
     ()
   }
 
-  test("source -> sink graph") {
-    assertTopic(topic) shouldBe true
-    withSourceSinkGraph()
-    countMessages(topic) shouldEqual 0
-  }
-
   def withSourceSinkGraph(): Unit = {
     val runnableGraph = RunnableGraph.fromGraph(GraphDSL.create() { implicit builder =>
       import GraphDSL.Implicits._
@@ -105,12 +111,6 @@ class KafkaAkkaStreamsTest extends FunSuite with BeforeAndAfterAll with Matchers
     })
     runnableGraph.run
     ()
-  }
-
-  test("source -> flow -> sink graph") {
-    assertTopic(topic) shouldBe true
-    withSourceFlowSinkGraph()
-    countMessages(topic) shouldEqual 0
   }
 
   def withSourceFlowSinkGraph(): Unit = {

@@ -9,10 +9,10 @@ import org.apache.kafka.clients.consumer.KafkaConsumer
 
 import scala.collection.JavaConverters._
 
-object KafkaCommon {
-  import TestConf._
+object Common {
+  import Conf._
 
-  def assertTopic(topic: String): Boolean = {
+  def createTopic(topic: String): Boolean = {
     val adminClient = AdminClient.create(adminClientProperties)
     val newTopic = new NewTopic(topic, 1, 1.toShort)
     val createTopicResult = adminClient.createTopics(List(newTopic).asJavaCollection)
