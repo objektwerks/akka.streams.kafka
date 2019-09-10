@@ -19,7 +19,7 @@ object Common {
     createTopicResult.values().containsKey(topic)
   }
 
-  def countMessages(topic: String)(implicit logger: LoggingAdapter): Int = {
+  def countRecords(topic: String)(implicit logger: LoggingAdapter): Int = {
     val consumer = new KafkaConsumer[String, String](kafkaConsumerProperties)
     consumer.subscribe(List(topic).asJava)
     val count = new AtomicInteger()

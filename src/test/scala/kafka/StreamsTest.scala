@@ -30,29 +30,29 @@ class StreamsTest extends FunSuite with BeforeAndAfterAll with Matchers {
   test("producer -> consumer") {
     createTopic(topic) shouldBe true
 
-    produceMessages()
-    val postProduceMessageCount = countMessages(topic)
+    produceRecords()
+    val postProduceRecordCount = countRecords(topic)
 
-    consumeMessages()
-    val postConsumeMessageCount = countMessages(topic)
+    consumeRecords()
+    val postConsumeRecordCount = countRecords(topic)
 
-    postProduceMessageCount should be >= 3
-    postConsumeMessageCount shouldEqual 0
+    postProduceRecordCount should be >= 3
+    postConsumeRecordCount shouldEqual 0
   }
 
   test("source -> sink graph") {
     createTopic(topic) shouldBe true
     withSourceSinkGraph()
-    countMessages(topic) shouldEqual 0
+    countRecords(topic) shouldEqual 0
   }
 
   test("source -> flow -> sink graph") {
     createTopic(topic) shouldBe true
     withSourceFlowSinkGraph()
-    countMessages(topic) shouldEqual 0
+    countRecords(topic) shouldEqual 0
   }
 
-  def produceMessages(): Unit = {
+  def produceRecords(): Unit = {
     val done = Source(1 to 3)
       .map(_.toString)
       .map { string =>
@@ -65,7 +65,7 @@ class StreamsTest extends FunSuite with BeforeAndAfterAll with Matchers {
     ()
   }
 
-  def consumeMessages(): Unit = {
+  def consumeRecords(): Unit = {
     val done = Consumer
       .committableSource(consumerSettings, subscriptions)
       .map { message =>
