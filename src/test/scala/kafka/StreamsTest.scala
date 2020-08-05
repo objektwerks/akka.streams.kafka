@@ -2,23 +2,25 @@ package kafka
 
 import akka.actor.ActorSystem
 import akka.kafka.scaladsl.{Committer, Consumer, Producer}
-import akka.stream.{ActorMaterializer, ClosedShape}
+import akka.stream.ClosedShape
 import akka.stream.scaladsl.{Flow, GraphDSL, Keep, RunnableGraph, Sink, Source}
+
 import org.apache.kafka.clients.consumer.ConsumerRecord
 import org.apache.kafka.clients.producer.ProducerRecord
-import org.scalatest.{BeforeAndAfterAll, FunSuite, Matchers}
+import org.scalatest.funsuite.AnyFunSuite
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.util.Try
 
-class StreamsTest extends FunSuite with BeforeAndAfterAll with Matchers {
+class StreamsTest extends AnyFunSuite with BeforeAndAfterAll with Matchers {
   import Conf._
   import Common._
 
   implicit val system = ActorSystem.create("kafka-akka-streams-test", config)
-  implicit val materializer = ActorMaterializer()
   implicit val dispatcher = system.dispatcher
   implicit val logger = system.log
 
