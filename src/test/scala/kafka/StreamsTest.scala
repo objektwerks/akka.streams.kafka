@@ -25,7 +25,7 @@ class StreamsTest extends AnyFunSuite with BeforeAndAfterAll with Matchers {
   implicit val logger = system.log
 
   override protected def afterAll(): Unit = {
-    Await.result(system.terminate, 9 seconds)
+    Await.result(system.terminate(), 9 seconds)
     ()
   }
 
@@ -113,7 +113,7 @@ class StreamsTest extends AnyFunSuite with BeforeAndAfterAll with Matchers {
 
       ClosedShape
     })
-    runnableGraph.run
+    runnableGraph.run()
     ()
   }
 
@@ -141,7 +141,7 @@ class StreamsTest extends AnyFunSuite with BeforeAndAfterAll with Matchers {
 
       ClosedShape
     })
-    runnableGraph.run
+    runnableGraph.run()
     ()
   }
 }

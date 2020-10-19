@@ -4,10 +4,11 @@ import java.time.Duration
 import java.util.concurrent.atomic.AtomicInteger
 
 import akka.event.LoggingAdapter
+
 import org.apache.kafka.clients.admin.{AdminClient, NewTopic}
 import org.apache.kafka.clients.consumer.KafkaConsumer
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 object Common {
   import Conf._
