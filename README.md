@@ -1,4 +1,4 @@
-Kafka Akka Streams
+Akka Streams Kafka
 ------------------
 >The purpose of this project is to test Akka Streams Alpakka Kafka connnector features.
 
