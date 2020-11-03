@@ -1,4 +1,4 @@
-package kafka
+package streams
 
 import akka.actor.ActorSystem
 import akka.kafka.scaladsl.{Committer, Consumer, Producer}

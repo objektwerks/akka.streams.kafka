@@ -1,15 +1,9 @@
 Akka Streams Kafka
 ------------------
->The purpose of this project is to test Akka Streams Alpakka Kafka connnector features.
-
-Homebrew
---------
->Install Homebrew on OSX.
+>Akka Streams and Alpakka Kafka Connector feature tests.
 
 Installation
 ------------
->Install the following packages via Homebrew:
-
 1. brew tap homebrew/services
 2. brew install scala
 3. brew install sbt
@@ -25,15 +19,8 @@ Kafka
 
 Service
 -------
->Start:
-
-1. brew services start zookeeper
-2. brew services start kafka
-
->Stop:
-
-1. brew services stop kafka
-2. brew services stop zookeeper
+1. brew services start zookeeper & kafka
+2. brew services stop kafka & zookeeper
 
 Test
 ----

@@ -1,4 +1,4 @@
-package kafka
+package streams
 
 import java.util.Properties
 
