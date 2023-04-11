@@ -24,7 +24,6 @@ import scala.util.Try
 
 class StreamTest extends AnyFunSuite with BeforeAndAfterAll with Matchers {
   import Conf._
-  import Common._
 
   implicit val system = ActorSystem.create("kafka-akka-streams-test", config)
   implicit val dispatcher = system.dispatcher
