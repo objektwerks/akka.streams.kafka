@@ -22,9 +22,9 @@ import scala.jdk.CollectionConverters._
 import scala.language.postfixOps
 import scala.util.Try
 
-class StreamTest extends AnyFunSuite with BeforeAndAfterAll with Matchers {
-  import Conf._
+import Conf._
 
+class StreamTest extends AnyFunSuite with BeforeAndAfterAll with Matchers {
   implicit val system = ActorSystem.create("kafka-akka-streams-test", config)
   implicit val dispatcher = system.dispatcher
   implicit val logger = system.log
