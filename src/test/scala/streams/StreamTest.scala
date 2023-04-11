@@ -16,7 +16,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.util.Try
 
-class StreamsTest extends AnyFunSuite with BeforeAndAfterAll with Matchers {
+class StreamTest extends AnyFunSuite with BeforeAndAfterAll with Matchers {
   import Conf._
   import Common._
 
