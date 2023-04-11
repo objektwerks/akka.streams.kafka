@@ -74,14 +74,8 @@ class StreamsTest extends AnyFunSuite with BeforeAndAfterAll with Matchers {
         logger.info(s"*** Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
         message.committableOffset
       }
-      // .toMat(Committer.sink(committerSettings))(Keep.right)
-      // .mapMaterializedValue(DrainingControl.apply)
-      // .run
-      // Somehow prevents message consume and offset commit ( with Keep.both set above ).
-      // This code does not work for me!;)
       .runWith(Sink.ignore)
     Try(Await.result(done, 3 seconds))
-    // Future[Done] never completes, so it times out. But messages are consumed and offsets committed.
     ()
   }
 
