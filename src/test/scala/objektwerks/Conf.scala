@@ -19,7 +19,7 @@ object Conf {
   val committerConfig = config.getConfig("akka.kafka.committer")
   val topic = "kv"
 
-  val kafkaConsumerProperties = loadProperties("/kafka-consumer.properties")
+  val kafkaConsumerProperties = loadProperties("/kafka.properties")
   val adminClientProperties = new Properties()
   adminClientProperties.setProperty(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
 
