@@ -4,11 +4,8 @@ Akka Streams Kafka
 
 Installation
 ------------
-1. brew tap homebrew/services
-2. brew install scala
-3. brew install sbt
-4. brew install zookeeper
-5. brew install kafka
+1. brew install zookeeper
+2. brew install kafka
 
 Kafka
 -----
