@@ -1,11 +1,16 @@
 package objektwerks
 
+import java.time.Duration
+import java.util.concurrent.atomic.AtomicInteger
+
 import akka.actor.ActorSystem
+import akka.event.LoggingAdapter
 import akka.kafka.scaladsl.{Committer, Consumer, Producer}
 import akka.stream.ClosedShape
 import akka.stream.scaladsl.{Flow, GraphDSL, Keep, RunnableGraph, Sink, Source}
 
-import org.apache.kafka.clients.consumer.ConsumerRecord
+import org.apache.kafka.clients.admin.{AdminClient, NewTopic}
+import org.apache.kafka.clients.consumer.{ConsumerRecord, KafkaConsumer}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.scalatest.funsuite.AnyFunSuite
 import org.scalatest.BeforeAndAfterAll
@@ -13,6 +18,7 @@ import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
+import scala.jdk.CollectionConverters._
 import scala.language.postfixOps
 import scala.util.Try
 
@@ -75,7 +81,7 @@ class StreamTest extends AnyFunSuite with BeforeAndAfterAll with Matchers {
         message.committableOffset
       }
       .runWith(Sink.ignore)
-    Try(Await.result(done, 3 seconds))
+    Await.result(done, 3 seconds)
     ()
   }
 
@@ -136,5 +142,29 @@ class StreamTest extends AnyFunSuite with BeforeAndAfterAll with Matchers {
     })
     runnableGraph.run()
     ()
+  }
+
+  def createTopic(topic: String): Boolean = {
+    val adminClient = AdminClient.create(adminClientProperties)
+    val newTopic = new NewTopic(topic, 1, 1.toShort)
+    val createTopicResult = adminClient.createTopics(List(newTopic).asJavaCollection)
+    createTopicResult.values().containsKey(topic)
+  }
+
+  def countRecords(topic: String)(implicit logger: LoggingAdapter): Int = {
+    val consumer = new KafkaConsumer[String, String](kafkaConsumerProperties)
+    consumer.subscribe(List(topic).asJava)
+    val count = new AtomicInteger()
+    for (i <- 1 to 2) {
+      val records = consumer.poll(Duration.ofMillis(100L))
+      logger.info(s"+++ Consumer -> { ${records.count} } records polled on attempt { $i }.")
+      records.iterator.asScala.foreach { record =>
+        logger.info(s"+++ Consumer -> topic: ${record.topic} partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
+        count.incrementAndGet()
+      }
+    }
+    consumer.close()
+    logger.info(s"+++ Consumer -> record count is ${count.get}")
+    count.get
   }
 }
