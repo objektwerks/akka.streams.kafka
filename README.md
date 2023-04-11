@@ -14,10 +14,15 @@ Kafka
 1. listeners=PLAINTEXT://0.0.0.0:9092
 2. advertised.listeners=PLAINTEXT://127.0.0.1:9092
 
-Service
--------
-1. brew services start zookeeper & kafka
-2. brew services stop kafka & zookeeper
+Start Services
+--------------
+1. brew services start zookeeper
+2. brew services start kafka
+
+Stop Services
+-------------
+1. brew services stop kafka
+2. brew services stop zookeeper
 
 Test
 ----
