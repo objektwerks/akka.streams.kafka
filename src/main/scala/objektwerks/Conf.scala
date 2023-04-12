@@ -1,4 +1,4 @@
-
+package objektwerks
 
 import java.util.Properties
 
@@ -17,7 +17,7 @@ final class Conf {
   val producerConfig = config.getConfig("akka.kafka.producer")
   val consumerConfig = config.getConfig("akka.kafka.consumer")
   val committerConfig = config.getConfig("akka.kafka.committer")
-  val topic = conf.getString("kafka.topic")
+  val topic = config.getString("kafka.topic")
 
   val properties = loadProperties("/kafka.properties")
 

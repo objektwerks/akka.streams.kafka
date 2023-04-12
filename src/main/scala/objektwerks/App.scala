@@ -1,18 +1,19 @@
 package objektwerks
 
 import java.time.Duration
-import java.util.concurrent.atomic.AtomicInteger
 
 import akka.actor.ActorSystem
-import akka.event.LoggingAdapter
 
-import Conf._
+import scala.concurrent.Await
+import scala.concurrent.duration._
+import scala.language.postfixOps
 
 object App {
   def main(args: Array[String]): Unit = {
-    val kafka = Kafka()
+    val conf = new Conf()
+    val kafka = new Kafka(conf)
 
-    implicit val system = ActorSystem.create("akka-streams-kafka", config)
+    implicit val system = ActorSystem.create("akka-streams-kafka", conf.config)
     implicit val dispatcher = system.dispatcher
     implicit val logger = system.log
 

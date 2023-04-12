@@ -1,4 +1,4 @@
-
+package objektwerks
 
 import io.github.embeddedkafka._
 
@@ -14,10 +14,6 @@ import org.apache.kafka.clients.producer.KafkaProducer
 
 import scala.io.Source
 import scala.jdk.CollectionConverters._
-
-object Kafka {
-  def apply(): Kafka = new Kafka()
-}
 
 final class Kafka(conf: Conf) extends EmbeddedKafka {
   val logger = LoggerFactory.getLogger(getClass)
