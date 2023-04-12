@@ -64,7 +64,7 @@ object App extends EmbeddedKafka {
         accumulatorActor ! Sum
         record
       }
-      .runWith(Sink.foreach(println)) // Processes all 10 partitions!!! But how?
+      .runWith(Sink.foreach(println)) // Processes all 10 partitions in an unordered manner!!! But how?
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app.")
 
     StdIn.readLine()
