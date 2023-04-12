@@ -17,7 +17,7 @@ object Conf {
   val producerConfig = config.getConfig("akka.kafka.producer")
   val consumerConfig = config.getConfig("akka.kafka.consumer")
   val committerConfig = config.getConfig("akka.kafka.committer")
-  val topic = "kv"
+  val topic = conf.getString("kafka.topic")
 
   val kafkaConsumerProperties = loadProperties("/kafka.properties")
   val adminClientProperties = new Properties()

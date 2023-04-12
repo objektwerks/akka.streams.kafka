@@ -19,12 +19,15 @@ object Kafka {
   def apply(): Kafka = new Kafka()
 }
 
-class Kafka extends EmbeddedKafka {
+final class Kafka extends EmbeddedKafka {
   val logger = LoggerFactory.getLogger(getClass)
+
   implicit val config = EmbeddedKafkaConfig.defaultConfig
+  val properties = loadProperties("/kafka.properties")
+
   implicit val serializer = new StringSerializer()
   implicit val deserializer = new StringDeserializer()
-  val properties = loadProperties("/kafka.properties")
+
   val producer = new KafkaProducer[String, String](properties)
   val consumer = new KafkaConsumer[String, String](properties)
 
