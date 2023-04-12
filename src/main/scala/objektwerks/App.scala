@@ -40,10 +40,7 @@ object App extends EmbeddedKafka {
     val consumerDone = Consumer
       .plainSource(conf.consumerSettings, conf.subscriptions)
       .runWith(Sink.foreach(println))
-    Thread.sleep(10000)
-    println("*** consumer finished.")
-
-    println(s"*** once consumer records are printed, depress RETURN key to stop app.")
+    println(s"*** once consumer records have been printed, depress RETURN key to shutdown app.")
 
     StdIn.readLine()
 
