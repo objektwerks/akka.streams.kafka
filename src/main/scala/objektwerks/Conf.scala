@@ -1,4 +1,4 @@
-package objektwerks
+
 
 import java.util.Properties
 

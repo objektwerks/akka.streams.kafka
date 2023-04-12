@@ -6,7 +6,7 @@
         </encoder>
     </appender>
     <appender name="file" class="ch.qos.logback.core.FileAppender">
-        <file>./target/test.log</file>
+        <file>./target/app.log</file>
         <append>true</append>
         <encoder>
             <pattern>%X{akkaTimestamp} %-5level %logger{36} %X{akkaSource} - %msg%n</pattern>
