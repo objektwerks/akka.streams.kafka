@@ -2,7 +2,7 @@ package objektwerks
 
 import io.github.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 
-import akka.actor.{Actor, ActorSystem}
+import akka.actor.{Actor, ActorSystem, Props}
 import akka.kafka.scaladsl.{Consumer, Producer}
 import akka.stream.scaladsl.{Sink, Source}
 
@@ -36,6 +36,8 @@ object App extends EmbeddedKafka {
 
     implicit val system = ActorSystem.create("akka-streams-kafka", conf.config)
     implicit val dispatcher = system.dispatcher
+    val accumulatorActor = system.actorOf(Props[AccumulatorActor], "accumulator-actor")
+
     println("*** akka system started")
 
     println("*** producer producing records ...")
