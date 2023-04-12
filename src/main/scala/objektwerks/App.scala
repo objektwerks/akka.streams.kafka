@@ -31,20 +31,22 @@ object App extends EmbeddedKafka {
     logger.info("*** akka system started")
 
     val producerDone = Source(1 to 10)
-      .map(integer => new ProducerRecord[String, String](conf.topic, integer.toString))
+      .map(integer => integer.toString)
+      .map(integer => new ProducerRecord[String, String](conf.topic, 0, integer, integer))
       .runWith(Producer.plainSink(conf.producerSettings))
+    Await.result(producerDone, 10 seconds)
     logger.info("*** Producer finished.")
 
     val consumerDone = Consumer
       .plainSource(conf.consumerSettings, conf.subscriptions)
-      .runWith(Sink.foreach { record => println( s"*** [${record.offset}] key: ${record.key} -> value: ${record.value}") } )
-    Thread.sleep(3000)
+      .runWith(Sink.foreach(println))
+    Await.result(consumerDone, 30 seconds)
     logger.info("*** Consumer finished.")
-
-    kafka.stop(false)
-    logger.info("*** embedded kafka stopped")
 
     Await.result(system.terminate(), 30 seconds)
     logger.info("*** akka system stopped")
+
+    kafka.stop(false)
+    logger.info("*** embedded kafka stopped")
   }
 }
