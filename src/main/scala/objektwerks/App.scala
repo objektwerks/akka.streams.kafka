@@ -58,7 +58,7 @@ object App extends EmbeddedKafka {
         accumulatorActor ! Sum
         record
       }
-      .run()
+      .runWith(Sink.ignore)
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app.")
 
     StdIn.readLine()
