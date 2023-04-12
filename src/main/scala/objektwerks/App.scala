@@ -32,19 +32,15 @@ object App extends EmbeddedKafka {
       .map(value => new ProducerRecord[String, String](conf.topic, value.toString))
       .runWith(Producer.plainSink(conf.producerSettings))
 
-    producerDone onComplete  {
-      case Success(_) => logger.info("*** Producer succeeded!")
-      case Failure(error) => logger.info(s"*** Producer failed: ${error.getMessage}")
-    }
+    Await.result(producerDone, 10 seconds)
+    logger.info("*** Producer finished.")
 
     val consumerDone = Consumer
       .plainSource(conf.consumerSettings, conf.subscriptions)
       .runWith(Sink.foreach(println))
 
-    consumerDone onComplete  {
-      case Success(_) => logger.info("*** Consumer succeeded!")
-      case Failure(error) => logger.info(s"*** Consumer failed: ${error.getMessage}")
-    }
+    Await.result(consumerDone, 10 seconds)
+    logger.info("*** Consumer finished.")
 
     Await.result(system.terminate(), 10 seconds)
     logger.info("*** akka system stopped")
