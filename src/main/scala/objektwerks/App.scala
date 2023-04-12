@@ -28,7 +28,7 @@ object App extends EmbeddedKafka {
     implicit val dispatcher = system.dispatcher
     logger.info("*** akka system started")
 
-    val producerDone = Source(1 to 100)
+    val producerDone = Source(1 to 10)
       .map(value => new ProducerRecord[String, String](conf.topic, value.toString))
       .runWith(Producer.plainSink(conf.producerSettings))
 
