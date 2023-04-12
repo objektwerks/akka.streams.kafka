@@ -2,7 +2,7 @@ package objektwerks
 
 import io.github.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 
-import akka.actor.ActorSystem
+import akka.actor.{Actor, ActorSystem}
 import akka.kafka.scaladsl.{Consumer, Producer}
 import akka.stream.scaladsl.{Sink, Source}
 
@@ -12,6 +12,19 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.io.StdIn
 import scala.language.postfixOps
+
+sealed trait Accumulator
+case class Add(i: Int) extends Accumulator
+case object Sum extends Accumulator
+
+final class AccumulatorActor extends Actor {
+  var acc = 0
+
+  override def receive: Receive = {
+    case Add(i) =>
+      acc = acc + i
+  }
+}
 
 object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
