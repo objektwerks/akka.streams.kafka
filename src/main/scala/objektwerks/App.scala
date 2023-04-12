@@ -10,7 +10,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import org.apache.kafka.clients.producer.ProducerRecord
 
 import scala.collection.mutable
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.util.{Failure, Success}
@@ -33,7 +33,6 @@ object App extends EmbeddedKafka {
       .map(integer => integer.toString)
       .map(integer => new ProducerRecord[String, String](conf.topic, 0, integer, integer))
       .runWith(Producer.plainSink(conf.producerSettings))
-    Await.result(producerDone, 10 seconds)
     println("*** producer finished.")
 
     println("*** consumer consuming records ...")
