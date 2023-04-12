@@ -38,7 +38,7 @@ object App extends EmbeddedKafka {
     }
 
 
-    Await.result(system.terminate(), 30 seconds)
+    Await.result(system.terminate(), 10 seconds)
     logger.info("*** akka system stopped")
 
     kafka.stop(false)
