@@ -19,9 +19,7 @@ final class Conf {
   val committerConfig = config.getConfig("akka.kafka.committer")
   val topic = conf.getString("kafka.topic")
 
-  val kafkaConsumerProperties = loadProperties("/kafka.properties")
-  val adminClientProperties = new Properties()
-  adminClientProperties.setProperty(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092")
+  val properties = loadProperties("/kafka.properties")
 
   val producerSettings = ProducerSettings[String, String](producerConfig, new StringSerializer, new StringSerializer)
     .withBootstrapServers(producerConfig.getString("bootstrap.servers"))

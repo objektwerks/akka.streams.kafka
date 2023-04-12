@@ -19,17 +19,15 @@ object Kafka {
   def apply(): Kafka = new Kafka()
 }
 
-final class Kafka() extends EmbeddedKafka {
+final class Kafka(conf: Conf) extends EmbeddedKafka {
   val logger = LoggerFactory.getLogger(getClass)
 
   implicit val config = EmbeddedKafkaConfig.defaultConfig
-  val properties = loadProperties("/kafka.properties")
-
   implicit val serializer = new StringSerializer()
   implicit val deserializer = new StringDeserializer()
 
-  val producer = new KafkaProducer[String, String](properties)
-  val consumer = new KafkaConsumer[String, String](properties)
+  val producer = new KafkaProducer[String, String](conf.properties)
+  val consumer = new KafkaConsumer[String, String](conf.properties)
 
   val kafka = EmbeddedKafka.start()
   logger.info("*** embedded kafka started")
@@ -52,11 +50,5 @@ final class Kafka() extends EmbeddedKafka {
     val records = consumer.poll( Duration.ofMillis(6000L) ).asScala.toList
     logger.info("*** consumer poll: {}", records.size)
     records
-  }
-
-  def loadProperties(file: String): Properties = {
-    val properties = new Properties()
-    properties.load(Source.fromInputStream(getClass.getResourceAsStream(file)).bufferedReader())
-    properties
   }
 }
