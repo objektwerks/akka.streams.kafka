@@ -32,15 +32,11 @@ object App extends EmbeddedKafka {
     val producerDone = Source(1 to 10)
       .map(integer => new ProducerRecord[String, String](conf.topic, integer.toString))
       .runWith(Producer.plainSink(conf.producerSettings))
-
-    Await.result(producerDone, 10 seconds)
     logger.info("*** Producer finished.")
 
     val consumerDone = Consumer
       .plainSource(conf.consumerSettings, conf.subscriptions)
-      .runWith(Sink.foreach(println))
-
-    Await.result(consumerDone, 10 seconds)
+      .runWith(Sink.foreach( record => logger.info(s"*** key: ${record.key} -> value: ${record.value}")) )
     logger.info("*** Consumer finished.")
 
     Await.result(system.terminate(), 10 seconds)
