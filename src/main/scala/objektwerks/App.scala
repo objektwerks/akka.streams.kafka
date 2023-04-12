@@ -35,17 +35,16 @@ object App extends EmbeddedKafka {
       .runWith(Producer.plainSink(conf.producerSettings))
     logger.info("*** Producer finished.")
 
-    val records = mutable.ArrayBuffer[String]()
     val consumerDone = Consumer
       .plainSource(conf.consumerSettings, conf.subscriptions)
-      .runWith(Sink.foreach { record => records += s"*** [${record.offset}] key: ${record.key} -> value: ${record.value}" } )
-    records.foreach { record => println(record) }
+      .runWith(Sink.foreach { record => println( s"*** [${record.offset}] key: ${record.key} -> value: ${record.value}") } )
+    Thread.sleep(3000)
     logger.info("*** Consumer finished.")
 
     kafka.stop(false)
     logger.info("*** embedded kafka stopped")
 
-    system.terminate()
+    Await.result(system.terminate(), 30 seconds)
     logger.info("*** akka system stopped")
   }
 }
