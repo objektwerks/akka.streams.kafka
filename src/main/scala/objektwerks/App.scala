@@ -33,7 +33,7 @@ object App extends EmbeddedKafka {
       .runWith(Producer.plainSink(conf.producerSettings))
 
     producerDone onComplete  {
-      case Success(_) => logger.info("*** Producer done!")
+      case Success(_) => logger.info("*** Producer succeeded!")
       case Failure(error) => println(s"*** Producer failed: ${error.getMessage}")
     }
 
