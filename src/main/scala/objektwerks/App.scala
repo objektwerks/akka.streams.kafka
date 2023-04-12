@@ -1,23 +1,32 @@
 package objektwerks
 
-import java.time.Duration
+import io.github.embeddedkafka.EmbeddedKafka
 
 import akka.actor.ActorSystem
+
+import org.slf4j.LoggerFactory
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-object App {
+object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
+    val logger = LoggerFactory.getLogger(getClass)
+
     val conf = new Conf()
-    val kafka = new Kafka(conf)
+
+    val kafka = EmbeddedKafka.start()
+    logger.info("*** embedded kafka started")
 
     implicit val system = ActorSystem.create("akka-streams-kafka", conf.config)
     implicit val dispatcher = system.dispatcher
-    implicit val logger = system.log
+    logger.info("*** akka system started")
 
-    Await.result(system.terminate(), 9 seconds)
-    kafka.stop()
+    Await.result(system.terminate(), 30 seconds)
+    logger.info("*** akka system stopped")
+
+    kafka.stop(false)
+    logger.info("*** embedded kafka stopped")
   }
 }

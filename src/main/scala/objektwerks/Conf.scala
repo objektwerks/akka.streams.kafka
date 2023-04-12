@@ -1,5 +1,7 @@
 package objektwerks
 
+import io.github.embeddedkafka._
+
 import java.util.Properties
 
 import akka.kafka.{CommitterSettings, ConsumerSettings, ProducerSettings, Subscriptions}
@@ -12,7 +14,7 @@ import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializ
 
 import scala.io.Source
 
-final class Conf {
+final class Conf extends EmbeddedKafka {
   val config = ConfigFactory.load("app.conf")
   val properties = loadProperties("/kafka.properties")
 
