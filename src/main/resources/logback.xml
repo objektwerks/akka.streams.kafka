@@ -12,8 +12,7 @@
             <pattern>%X{akkaTimestamp} %-5level %logger{36} %X{akkaSource} - %msg%n</pattern>
         </encoder>
     </appender>
-    <root level="INFO">
-        <appender-ref ref="console"/>
+    <root level="DEBUG">
         <appender-ref ref="file"/>
     </root>
 </configuration>
