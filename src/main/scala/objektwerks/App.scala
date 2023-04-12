@@ -10,6 +10,7 @@ import akka.stream.scaladsl.{Sink, Source}
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
 
+import scala.collection.mutable
 import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -34,15 +35,17 @@ object App extends EmbeddedKafka {
       .runWith(Producer.plainSink(conf.producerSettings))
     logger.info("*** Producer finished.")
 
+    val records = mutable.ArrayBuffer[String]()
     val consumerDone = Consumer
       .plainSource(conf.consumerSettings, conf.subscriptions)
-      .runWith(Sink.foreach { record => println( s"*** [${record.offset}] key: ${record.key} -> value: ${record.value}") } )
+      .runWith(Sink.foreach { record => records += s"*** [${record.offset}] key: ${record.key} -> value: ${record.value}" } )
+    records.foreach { record => logger.info(record) }
     logger.info("*** Consumer finished.")
-
-    Await.result(system.terminate(), 10 seconds)
-    logger.info("*** akka system stopped")
 
     kafka.stop(false)
     logger.info("*** embedded kafka stopped")
+
+    Await.result(system.terminate(), 10 seconds)
+    logger.info("*** akka system stopped")
   }
 }
