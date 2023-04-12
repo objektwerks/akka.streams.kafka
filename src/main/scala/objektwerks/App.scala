@@ -40,7 +40,7 @@ object App extends EmbeddedKafka {
     val consumerDone = Consumer
       .plainSource(conf.consumerSettings, conf.subscriptions)
       .runWith(Sink.foreach(println))
-    Await.result(consumerDone, 30 seconds)
+    Thread.sleep(10000)
     logger.info("*** Consumer finished.")
 
     Await.result(system.terminate(), 30 seconds)
