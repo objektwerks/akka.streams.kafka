@@ -32,6 +32,12 @@ object App extends EmbeddedKafka {
 
     implicit val kafkaConfig = EmbeddedKafkaConfig.defaultConfig
     val kafka = EmbeddedKafka.start()
+    createCustomTopic(
+      topic = conf.topic,
+      topicConfig = kafkaConfig.customBrokerProperties,
+      partitions = 10,
+      replicationFactor = 1
+    ): Unit
     println("*** embedded kafka started")
 
     implicit val system = ActorSystem.create("akka-streams-kafka", conf.config)
@@ -41,9 +47,9 @@ object App extends EmbeddedKafka {
     println("*** akka system started")
 
     println("*** producer producing records ...")
-    val producerDone = Source(1 to 10)
+    val producerDone = Source(0 to 9)
       .map(integer => integer.toString)
-      .map(integer => new ProducerRecord[String, String](conf.topic, 0, integer, integer))
+      .map(integer => new ProducerRecord[String, String](conf.topic, integer.toInt, integer, integer))
       .runWith(Producer.plainSink(conf.producerSettings))
     println("*** producer finished.")
 
