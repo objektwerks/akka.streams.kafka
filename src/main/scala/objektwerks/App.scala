@@ -10,8 +10,8 @@ import org.apache.kafka.clients.producer.ProducerRecord
 
 import scala.concurrent.Await
 import scala.concurrent.duration._
-import scala.language.postfixOps
 import scala.io.StdIn
+import scala.language.postfixOps
 
 object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
