@@ -21,8 +21,8 @@ final class AccumulatorActor extends Actor {
   var acc = 0
 
   override def receive: Receive = {
-    case Add(i) =>
-      acc = acc + i
+    case Add(i) => acc = acc + i
+    case Sum => println(s"Accumulator Actor Sum: $acc")
   }
 }
 
@@ -50,7 +50,15 @@ object App extends EmbeddedKafka {
     println("*** consumer consuming records ...")
     val consumerDone = Consumer
       .plainSource(conf.consumerSettings, conf.subscriptions)
-      .runWith(Sink.foreach(println))
+      .map { record =>
+        accumulatorActor ! Add( record.value.toIntOption.getOrElse(0) )
+        record
+      }
+      .map { record =>
+        accumulatorActor ! Sum
+        record
+      }
+      .run()
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app.")
 
     StdIn.readLine()
