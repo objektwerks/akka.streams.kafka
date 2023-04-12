@@ -3,17 +3,14 @@ package objektwerks
 import io.github.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 
 import akka.actor.ActorSystem
-import akka.Done
 import akka.kafka.scaladsl.{Consumer, Producer}
 import akka.stream.scaladsl.{Sink, Source}
 
 import org.apache.kafka.clients.producer.ProducerRecord
 
-import scala.collection.mutable
 import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.language.postfixOps
-import scala.util.{Failure, Success}
 import scala.io.StdIn
 
 object App extends EmbeddedKafka {
