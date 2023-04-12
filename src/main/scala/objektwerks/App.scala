@@ -64,7 +64,10 @@ object App extends EmbeddedKafka {
         accumulatorActor ! Sum
         record
       }
-      .runWith(Sink.foreach(println)) // Processes all 10 partitions in an unordered manner!!! But how?
+      .runWith(Sink.foreach(println))
+      // The AccumulatorActor processes each of the 10 partitions in order.
+      // The Sink, however, prints each record out of order.
+      // Why?
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app.")
 
     StdIn.readLine()
