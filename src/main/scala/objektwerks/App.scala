@@ -4,8 +4,8 @@ import io.github.embeddedkafka.EmbeddedKafka
 
 import akka.actor.ActorSystem
 import akka.Done
-import akka.kafka.scaladsl.Producer
-import akka.stream.scaladsl.Source
+import akka.kafka.scaladsl.{Consumer, Producer}
+import akka.stream.scaladsl.{Sink, Source}
 
 import org.apache.kafka.clients.producer.ProducerRecord
 import org.slf4j.LoggerFactory
@@ -34,9 +34,17 @@ object App extends EmbeddedKafka {
 
     producerDone onComplete  {
       case Success(_) => logger.info("*** Producer succeeded!")
-      case Failure(error) => println(s"*** Producer failed: ${error.getMessage}")
+      case Failure(error) => logger.info(s"*** Producer failed: ${error.getMessage}")
     }
 
+    val consumerDone = Consumer
+      .plainSource(conf.consumerSettings, conf.subscriptions)
+      .runWith(Sink.foreach(println))
+
+    consumerDone onComplete  {
+      case Success(_) => logger.info("*** Consumer succeeded!")
+      case Failure(error) => logger.info(s"*** Consumer failed: ${error.getMessage}")
+    }
 
     Await.result(system.terminate(), 10 seconds)
     logger.info("*** akka system stopped")
