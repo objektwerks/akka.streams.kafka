@@ -40,7 +40,7 @@ object App extends EmbeddedKafka {
       .plainSource(conf.consumerSettings, conf.subscriptions)
       .runWith(Sink.foreach(println))
 
-    Await.result(consumerDone, 30 seconds)
+    Await.result(consumerDone, 10 seconds)
     logger.info("*** Consumer finished.")
 
     Await.result(system.terminate(), 10 seconds)
