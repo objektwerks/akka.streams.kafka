@@ -1,4 +1,4 @@
-
+package objektwerks
 
 import java.time.Duration
 import java.util.concurrent.atomic.AtomicInteger
@@ -6,19 +6,17 @@ import java.util.concurrent.atomic.AtomicInteger
 import akka.actor.ActorSystem
 import akka.event.LoggingAdapter
 
-class StreamTest extends AnyFunSuite with BeforeAndAfterAll with Matchers {
-  val kafka = Kafka()
+import Conf._
 
-  implicit val system = ActorSystem.create("kafka-akka-streams-test", config)
-  implicit val dispatcher = system.dispatcher
-  implicit val logger = system.log
+object App {
+  def main(args: Array[String]): Unit = {
+    val kafka = Kafka()
 
-  override protected def afterAll(): Unit = {
+    implicit val system = ActorSystem.create("akka-streams-kafka", config)
+    implicit val dispatcher = system.dispatcher
+    implicit val logger = system.log
+
     Await.result(system.terminate(), 9 seconds)
     kafka.stop()
-  }
-
-  test("producer -> consumer") {
-
   }
 }

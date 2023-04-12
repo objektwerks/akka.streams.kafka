@@ -19,7 +19,7 @@ object Kafka {
   def apply(): Kafka = new Kafka()
 }
 
-final class Kafka extends EmbeddedKafka {
+final class Kafka() extends EmbeddedKafka {
   val logger = LoggerFactory.getLogger(getClass)
 
   implicit val config = EmbeddedKafkaConfig.defaultConfig
