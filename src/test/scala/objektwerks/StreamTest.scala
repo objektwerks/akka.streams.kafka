@@ -15,6 +15,7 @@ class StreamTest extends AnyFunSuite with BeforeAndAfterAll with Matchers {
 
   override protected def afterAll(): Unit = {
     Await.result(system.terminate(), 9 seconds)
+    kafka.stop()
   }
 
   test("producer -> consumer") {
