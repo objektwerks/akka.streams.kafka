@@ -1,6 +1,6 @@
 package objektwerks
 
-import io.github.embeddedkafka.EmbeddedKafka
+import io.github.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 
 import akka.actor.ActorSystem
 import akka.Done
@@ -21,6 +21,7 @@ object App extends EmbeddedKafka {
 
     val conf = new Conf()
 
+    implicit val kafkaConfig = EmbeddedKafkaConfig.defaultConfig
     val kafka = EmbeddedKafka.start()
     logger.info("*** embedded kafka started")
 
