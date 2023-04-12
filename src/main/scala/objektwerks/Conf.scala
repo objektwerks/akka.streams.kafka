@@ -16,7 +16,6 @@ import scala.io.Source
 
 final class Conf extends EmbeddedKafka {
   val config = ConfigFactory.load("app.conf")
-  val properties = loadProperties("/kafka.properties")
 
   val producerConfig = config.getConfig("akka.kafka.producer")
   val producerSettings = ProducerSettings[String, String](producerConfig, new StringSerializer, new StringSerializer)
@@ -33,10 +32,4 @@ final class Conf extends EmbeddedKafka {
 
   val topic = config.getString("kafka.topic")
   val subscriptions = Subscriptions.topics(topic)
-
-  private def loadProperties(file: String): Properties = {
-    val properties = new Properties()
-    properties.load(Source.fromInputStream(getClass.getResourceAsStream(file)).bufferedReader())
-    properties
-  }
 }
