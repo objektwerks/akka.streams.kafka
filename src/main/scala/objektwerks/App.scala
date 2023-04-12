@@ -29,7 +29,7 @@ object App extends EmbeddedKafka {
     logger.info("*** akka system started")
 
     val producerDone = Source(1 to 10)
-      .map(value => new ProducerRecord[String, String](conf.topic, value.toString))
+      .map(integer => new ProducerRecord[String, String](conf.topic, integer.toString))
       .runWith(Producer.plainSink(conf.producerSettings))
 
     Await.result(producerDone, 10 seconds)
