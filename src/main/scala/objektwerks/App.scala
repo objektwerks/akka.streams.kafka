@@ -36,7 +36,7 @@ object App extends EmbeddedKafka {
 
     val consumerDone = Consumer
       .plainSource(conf.consumerSettings, conf.subscriptions)
-      .runWith(Sink.foreach( record => logger.info(s"*** key: ${record.key} -> value: ${record.value}")) )
+      .runWith(Sink.foreach { record => println( s"*** [${record.offset}] key: ${record.key} -> value: ${record.value}") } )
     logger.info("*** Consumer finished.")
 
     Await.result(system.terminate(), 10 seconds)
