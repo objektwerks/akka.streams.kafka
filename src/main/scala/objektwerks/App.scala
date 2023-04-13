@@ -59,9 +59,6 @@ object App extends EmbeddedKafka {
       .plainSource(conf.consumerSettings, conf.subscriptions)
       .map { record =>
         accumulatorActor ! Add( record.value.toIntOption.getOrElse(0) )
-        record
-      }
-      .map { record =>
         accumulatorActor ! Sum
         record
       }
