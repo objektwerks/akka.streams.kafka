@@ -8,11 +8,11 @@ sealed trait Accumulator
 final case class Add(i: Int) extends Accumulator
 final case object Sum extends Accumulator
 
-final class SumActor extends Actor {
-  val sum = new AtomicInteger(0)
+final class AccActor extends Actor {
+  val acc = new AtomicInteger(0)
 
   override def receive = {
-    case Add(i) => sum.addAndGet(i)
-    case Sum    => println(s"*** Accumulator Actor Sum: $sum")
+    case Add(i) => acc.addAndGet(i)
+    case Sum    => println(s"*** Accumulator Actor Sum: $acc")
   }
 }
