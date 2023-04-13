@@ -12,16 +12,17 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.io.StdIn
 import scala.language.postfixOps
+import java.util.concurrent.atomic.AtomicInteger
 
 sealed trait Accumulator
 case class Add(i: Int) extends Accumulator
 case object Sum extends Accumulator
 
 final class AccumulatorActor extends Actor {
-  var acc = 0
+  val acc = new AtomicInteger(0)
 
   override def receive: Receive = {
-    case Add(i) => acc = acc + i
+    case Add(i) => acc.addAndGet(i)
     case Sum => println(s"*** Accumulator Actor Sum: $acc")
   }
 }
