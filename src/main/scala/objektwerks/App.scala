@@ -14,19 +14,6 @@ import scala.io.StdIn
 import scala.language.postfixOps
 import java.util.concurrent.atomic.AtomicInteger
 
-sealed trait Accumulator
-case class Add(i: Int) extends Accumulator
-case object Sum extends Accumulator
-
-final class AccumulatorActor extends Actor {
-  val acc = new AtomicInteger(0)
-
-  override def receive = {
-    case Add(i) => acc.addAndGet(i)
-    case Sum => println(s"*** Accumulator Actor Sum: $acc")
-  }
-}
-
 object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
     val conf = new Conf()
