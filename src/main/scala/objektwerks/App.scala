@@ -47,7 +47,7 @@ object App extends EmbeddedKafka {
         accActor ! Sum
         record
       }
-      .runWith(Sink.foreach(println)) // Records are processed out of order! Why? Are they processed in parallel?
+      .runWith(Sink.foreach(println)) // Records are processed out of order! Or, are they? Why? Are they processed in parallel?
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app.")
 
     StdIn.readLine()
