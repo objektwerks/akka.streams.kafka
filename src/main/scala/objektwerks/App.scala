@@ -21,7 +21,7 @@ case object Sum extends Accumulator
 final class AccumulatorActor extends Actor {
   val acc = new AtomicInteger(0)
 
-  override def receive: Receive = {
+  override def receive = {
     case Add(i) => acc.addAndGet(i)
     case Sum => println(s"*** Accumulator Actor Sum: $acc")
   }
