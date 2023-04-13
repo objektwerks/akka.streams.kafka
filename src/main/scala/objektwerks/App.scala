@@ -13,6 +13,7 @@ import scala.concurrent.duration._
 import scala.io.StdIn
 import scala.language.postfixOps
 
+import objektwerks.{Add, Sum, AccumulatorActor}
 object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
     val conf = new Conf()
