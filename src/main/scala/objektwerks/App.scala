@@ -29,7 +29,7 @@ object App extends EmbeddedKafka {
 
     implicit val system = ActorSystem.create("akka-streams-kafka", conf.config)
     implicit val dispatcher = system.dispatcher
-    val accumulatorActor = system.actorOf(Props[AccumulatorActor], "accumulator-actor")
+    val sumActor = system.actorOf(Props[SumActor], "sum-actor")
 
     println("*** akka system started")
 
@@ -43,8 +43,8 @@ object App extends EmbeddedKafka {
     Consumer
       .plainSource(conf.consumerSettings, conf.subscriptions)
       .map { record =>
-        accumulatorActor ! Add( record.value.toIntOption.getOrElse(0) )
-        accumulatorActor ! Sum
+        sumActor ! Add( record.value.toIntOption.getOrElse(0) )
+        sumActor ! Sum
         record
       }
       .runWith(Sink.foreach(println)) // Records are processed out of order! Why? Are they processed in parallel?
