@@ -12,7 +12,6 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.io.StdIn
 import scala.language.postfixOps
-import java.util.concurrent.atomic.AtomicInteger
 
 object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
