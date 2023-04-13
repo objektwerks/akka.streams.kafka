@@ -13,6 +13,6 @@ final class AccActor extends Actor {
 
   override def receive = {
     case Add(i) => acc.addAndGet(i)
-    case Sum    => println(s"*** Acc Actor sum: $acc")
+    case Sum    => println(s"*** Acc actor sum: $acc")
   }
 }
