@@ -5,8 +5,8 @@ import akka.actor.Actor
 import java.util.concurrent.atomic.AtomicInteger
 
 sealed trait Accumulator
-case class Add(i: Int) extends Accumulator
-case object Sum extends Accumulator
+final case class Add(i: Int) extends Accumulator
+final case object Sum extends Accumulator
 
 final class AccumulatorActor extends Actor {
   val acc = new AtomicInteger(0)
