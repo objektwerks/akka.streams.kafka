@@ -48,6 +48,9 @@ object App extends EmbeddedKafka {
         record
       }
       .runWith(Sink.foreach(println)) // Records are processed out of order!
+
+    // TODO - Source per Partition ( https://doc.akka.io/docs/alpakka-kafka/current/consumer.html )
+
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app.")
 
     StdIn.readLine()
