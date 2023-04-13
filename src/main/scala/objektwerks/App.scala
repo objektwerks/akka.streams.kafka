@@ -49,7 +49,7 @@ object App extends EmbeddedKafka {
     println("*** producer producing records ...")
     Source(0 to 9)
       .map(integer => integer.toString)
-      .map(integer => new ProducerRecord[String, String](conf.topic, integer.toInt, integer, integer))
+      .map(integer => new ProducerRecord[String, String](conf.topic, integer.toInt, integer, (integer.toInt + 1).toString ))
       .runWith(Producer.plainSink(conf.producerSettings))
     println("*** producer finished.")
 
