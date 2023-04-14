@@ -3,7 +3,7 @@ package objektwerks
 import io.github.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 
 import akka.actor.{Actor, ActorSystem, Props}
-import akka.kafka.scaladsl.{Consumer, Producer}
+import akka.kafka.scaladsl.{Consumer, Producer, Transactional}
 import akka.stream.scaladsl.{Sink, Source}
 
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -44,9 +44,10 @@ object App extends EmbeddedKafka {
     println("*** producer finished")
 
     println(s"*** consuming records from topic: $topic with mapAsync parallelism set to: $parallelism ...")
-    Consumer
-      .plainSource(conf.consumerSettings, conf.subscription)
-      .mapAsync(parallelism) { record =>
+    Transactional
+      .source(conf.consumerSettings, conf.subscription)
+      .mapAsync(parallelism) { message =>
+        val record = message.record
         accumulator ! Add( record.partition, record.offset, record.key, record.value.toIntOption.getOrElse(0) )
         Future.unit
       }
