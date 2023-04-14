@@ -13,8 +13,6 @@ import scala.concurrent.duration._
 import scala.io.StdIn
 import scala.language.postfixOps
 
-import objektwerks.Add
-
 object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
     val conf = new Conf()
@@ -46,7 +44,7 @@ object App extends EmbeddedKafka {
     println(s"*** consumer consuming records from topic: $topic ...")
     Consumer
       .plainSource(conf.consumerSettings, conf.subscription)
-      .mapAsync(4) { record =>
+      .mapAsync(conf.parallelism) { record =>
         accumulator ! Add( record.partition, record.offset, record.key, record.value.toIntOption.getOrElse(0) )
         Future.unit
       }
