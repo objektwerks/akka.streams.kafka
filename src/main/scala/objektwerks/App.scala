@@ -36,13 +36,13 @@ object App extends EmbeddedKafka {
 
     println("*** akka system started")
 
-    println(s"*** producer producing records to topic $topic ...")
+    println(s"*** producer producing records to topic: $topic ...")
     Source(0 to 9)
       .map(integer => new ProducerRecord[String, String](topic, integer, integer.toString, integer.toString ))
       .runWith(Producer.plainSink(conf.producerSettings))
     println("*** producer finished.")
 
-    println(s"*** consumer consuming records from topic $topic ...")
+    println(s"*** consumer consuming records from topic: $topic ...")
     Consumer
       .plainSource(conf.consumerSettings, conf.subscription)
       .map { record =>
