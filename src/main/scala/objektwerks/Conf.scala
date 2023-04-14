@@ -32,5 +32,5 @@ final class Conf {
   val committerSettings = CommitterSettings(committerConfig)
 
   val topic = config.getString("kafka.topic")
-  val subscriptions = Subscriptions.topics(topic)
+  val subscription = Subscriptions.topics(topic)
 }

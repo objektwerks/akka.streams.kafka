@@ -42,7 +42,7 @@ object App extends EmbeddedKafka {
 
     println("*** consumer consuming records ...")
     Consumer
-      .plainSource(conf.consumerSettings, conf.subscriptions)
+      .plainSource(conf.consumerSettings, conf.subscription)
       .map { record =>
         accActor ! Add( record.value.toIntOption.getOrElse(0) )
         accActor ! Sum
