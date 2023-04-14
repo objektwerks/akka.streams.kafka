@@ -38,7 +38,7 @@ object App extends EmbeddedKafka {
     println("*** akka system started")
 
     println(s"*** producer producing records to topic: $topic ...")
-    Source(0 to partitions)
+    Source(0 until partitions)
       .map(integer => new ProducerRecord[String, String](topic, integer, integer.toString, integer.toString ))
       .runWith(Producer.plainSink(conf.producerSettings))
     println("*** producer finished.")
