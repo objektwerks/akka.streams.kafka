@@ -8,14 +8,13 @@ import akka.stream.scaladsl.{Sink, Source}
 
 import org.apache.kafka.clients.producer.ProducerRecord
 
-import scala.concurrent.Await
+import scala.concurrent.{Await, Future}
 import scala.concurrent.duration._
 import scala.io.StdIn
 import scala.language.postfixOps
-import akka.kafka.scaladsl.Committer
 
 import objektwerks.Add
-import scala.concurrent.Future
+
 object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
     val conf = new Conf()
@@ -49,7 +48,7 @@ object App extends EmbeddedKafka {
       .plainSource(conf.consumerSettings, conf.subscription)
       .mapAsync(2) { record =>
         accumulator ! Add( record.partition, record.offset, record.key, record.value.toIntOption.getOrElse(0) )
-        Future.successful()
+        Future.unit
       }
       .to(Sink.ignore)
       .run()
