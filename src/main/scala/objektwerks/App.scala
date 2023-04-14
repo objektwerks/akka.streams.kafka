@@ -59,6 +59,6 @@ object App extends EmbeddedKafka {
 
     kafka.stop(true)
     println("*** embedded kafka stopped")
-    println("*** see /target/app.log for details")
+    println("*** see log at /target/app.log")
   }
 }
