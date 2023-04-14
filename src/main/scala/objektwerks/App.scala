@@ -41,7 +41,7 @@ object App extends EmbeddedKafka {
     Source(0 until partitions)
       .map(integer => new ProducerRecord[String, String](topic, integer, integer.toString, integer.toString ))
       .runWith(Producer.plainSink(conf.producerSettings))
-    println("*** producer finished.")
+    println("*** producer finished")
 
     println(s"*** consuming records from topic: $topic with mapAsync parallelism set to: $parallelism ...")
     Consumer
@@ -51,7 +51,7 @@ object App extends EmbeddedKafka {
         Future.unit
       }
       .runWith(Sink.ignore)
-    println(s"*** once consumer records have been printed, depress RETURN key to shutdown app.")
+    println(s"*** once consumer records have been printed, depress RETURN key to shutdown app")
 
     StdIn.readLine()
 
