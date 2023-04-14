@@ -19,7 +19,7 @@ object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
     val conf = new Conf()
     val topic = conf.topic
-    val partitions = 10
+    val partitions = conf.partitions
 
     implicit val kafkaConfig = EmbeddedKafkaConfig.defaultConfig
     val kafka = EmbeddedKafka.start()
