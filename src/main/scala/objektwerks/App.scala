@@ -48,7 +48,7 @@ object App extends EmbeddedKafka {
         accumulator ! Add( record.partition, record.key, record.value.toIntOption.getOrElse(0) )
         record
       }
-      .runWith(Sink.foreach(println)) // Note record order.
+      .runWith(Sink.ignore)
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app.")
 
     StdIn.readLine()
