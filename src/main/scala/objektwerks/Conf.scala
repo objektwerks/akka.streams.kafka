@@ -9,6 +9,7 @@ import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializ
 
 final class Conf {
   val config = ConfigFactory.load("app.conf")
+  val partitions = config.getInt("kafka.partitions")
 
   val producerConfig = config.getConfig("akka.kafka.producer")
   val producerSettings = ProducerSettings[String, String](
