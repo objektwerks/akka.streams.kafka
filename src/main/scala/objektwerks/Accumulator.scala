@@ -12,6 +12,6 @@ final class Accumulator extends Actor {
   override def receive = {
     case Add(i) =>
       acc.addAndGet(i)
-      println(s"*** Accumulator add: $i - sum: $acc")
+      println(s"*** Accumulator add: $i -> sum: $acc")
   }
 }
