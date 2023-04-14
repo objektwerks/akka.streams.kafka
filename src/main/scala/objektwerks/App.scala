@@ -14,6 +14,7 @@ import scala.io.StdIn
 import scala.language.postfixOps
 import akka.kafka.scaladsl.Committer
 
+import objektwerks.Add
 object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
     val conf = new Conf()
@@ -30,7 +31,7 @@ object App extends EmbeddedKafka {
 
     implicit val system = ActorSystem.create("akka-streams-kafka", conf.config)
     implicit val dispatcher = system.dispatcher
-    val accActor = system.actorOf(Props[AccActor], "acc-actor")
+    val accActor = system.actorOf(Props[Accumulator], "acc-actor")
 
     println("*** akka system started")
 
