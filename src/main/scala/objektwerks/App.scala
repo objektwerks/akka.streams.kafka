@@ -45,7 +45,6 @@ object App extends EmbeddedKafka {
       .plainSource(conf.consumerSettings, conf.subscription)
       .map { record =>
         accActor ! Add( record.value.toIntOption.getOrElse(0) )
-        accActor ! Sum
         record
       }
       .runWith(Sink.foreach(println)) // Records are processed out of order!
