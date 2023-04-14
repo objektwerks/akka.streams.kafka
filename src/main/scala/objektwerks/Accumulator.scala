@@ -12,6 +12,6 @@ final class Accumulator extends Actor {
   override def receive = {
     case Add(partition, offset, key, value) =>
       acc.addAndGet(value)
-      println(s"*** Accumulator partition: $partition offset: $offset key: $key value: $value sum: $acc")
+      println(s"*** accumulator > partition: $partition offset: $offset key: $key value: $value sum: $acc")
   }
 }
