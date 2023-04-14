@@ -12,6 +12,7 @@ import scala.concurrent.Await
 import scala.concurrent.duration._
 import scala.io.StdIn
 import scala.language.postfixOps
+import akka.kafka.scaladsl.Committer
 
 object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
@@ -48,9 +49,6 @@ object App extends EmbeddedKafka {
         record
       }
       .runWith(Sink.foreach(println)) // Records are processed out of order!
-
-    // TODO - Source per Partition ( https://doc.akka.io/docs/alpakka-kafka/current/consumer.html )
-
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app.")
 
     StdIn.readLine()
