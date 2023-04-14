@@ -46,9 +46,9 @@ object App extends EmbeddedKafka {
     println(s"*** consumer consuming records from topic: $topic ...")
     Consumer
       .plainSource(conf.consumerSettings, conf.subscription)
-      .map { record =>
+      .mapAsync(4) { record =>
         accumulator ! Add( record.partition, record.offset, record.key, record.value.toIntOption.getOrElse(0) )
-        record
+        Future.unit
       }
       .runWith(Sink.ignore)
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app.")
