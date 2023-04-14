@@ -45,7 +45,7 @@ object App extends EmbeddedKafka {
     Consumer
       .plainSource(conf.consumerSettings, conf.subscription)
       .map { record =>
-        accumulator ! Add( record.value.toIntOption.getOrElse(0) )
+        accumulator ! Add( record.partition, record.value.toIntOption.getOrElse(0) )
         record
       }
       .runWith(Sink.foreach(println)) // Note record order.
