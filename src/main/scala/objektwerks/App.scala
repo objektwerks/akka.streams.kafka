@@ -19,7 +19,7 @@ object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
     val conf = new Conf()
     val topic = conf.topic
-    val partitions = 100
+    val partitions = 10
 
     implicit val kafkaConfig = EmbeddedKafkaConfig.defaultConfig
     val kafka = EmbeddedKafka.start()
@@ -46,12 +46,11 @@ object App extends EmbeddedKafka {
     println(s"*** consumer consuming records from topic: $topic ...")
     Consumer
       .plainSource(conf.consumerSettings, conf.subscription)
-      .mapAsync(2) { record =>
+      .map { record =>
         accumulator ! Add( record.partition, record.offset, record.key, record.value.toIntOption.getOrElse(0) )
-        Future.unit
+        record
       }
-      .to(Sink.ignore)
-      .run()
+      .runWith(Sink.ignore)
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app.")
 
     StdIn.readLine()
