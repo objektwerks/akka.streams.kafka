@@ -31,7 +31,7 @@ object App extends EmbeddedKafka {
 
     implicit val system = ActorSystem.create("akka-streams-kafka", conf.config)
     implicit val dispatcher = system.dispatcher
-    val accActor = system.actorOf(Props[Accumulator], "acc-actor")
+    val accumulator = system.actorOf(Props[Accumulator], "accumulator")
 
     println("*** akka system started")
 
@@ -45,7 +45,7 @@ object App extends EmbeddedKafka {
     Consumer
       .plainSource(conf.consumerSettings, conf.subscription)
       .map { record =>
-        accActor ! Add( record.value.toIntOption.getOrElse(0) )
+        accumulator ! Add( record.value.toIntOption.getOrElse(0) )
         record
       }
       .runWith(Sink.foreach(println)) // Records are processed out of order!
