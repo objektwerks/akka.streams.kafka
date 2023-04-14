@@ -18,6 +18,7 @@ import objektwerks.Add
 object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
     val conf = new Conf()
+    val topic = conf.topic
 
     implicit val kafkaConfig = EmbeddedKafkaConfig.defaultConfig
     val kafka = EmbeddedKafka.start()
@@ -35,13 +36,13 @@ object App extends EmbeddedKafka {
 
     println("*** akka system started")
 
-    println(s"*** producer producing records to topic ${conf.topic} ...")
+    println(s"*** producer producing records to topic $topic ...")
     Source(0 to 9)
-      .map(integer => new ProducerRecord[String, String](conf.topic, integer, integer.toString, integer.toString ))
+      .map(integer => new ProducerRecord[String, String](topic, integer, integer.toString, integer.toString ))
       .runWith(Producer.plainSink(conf.producerSettings))
     println("*** producer finished.")
 
-    println(s"*** consumer consuming records from topic ${conf.topic} ...")
+    println(s"*** consumer consuming records from topic $topic ...")
     Consumer
       .plainSource(conf.consumerSettings, conf.subscription)
       .map { record =>
