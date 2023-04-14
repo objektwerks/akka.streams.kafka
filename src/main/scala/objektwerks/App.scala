@@ -20,13 +20,14 @@ object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
     val conf = new Conf()
     val topic = conf.topic
+    val partitions = 100
 
     implicit val kafkaConfig = EmbeddedKafkaConfig.defaultConfig
     val kafka = EmbeddedKafka.start()
     createCustomTopic(
       topic = conf.topic,
       topicConfig = kafkaConfig.customBrokerProperties,
-      partitions = 10,
+      partitions = partitions,
       replicationFactor = 1
     ): Unit
     println("*** embedded kafka started")
@@ -38,7 +39,7 @@ object App extends EmbeddedKafka {
     println("*** akka system started")
 
     println(s"*** producer producing records to topic: $topic ...")
-    Source(0 to 9)
+    Source(0 to partitions)
       .map(integer => new ProducerRecord[String, String](topic, integer, integer.toString, integer.toString ))
       .runWith(Producer.plainSink(conf.producerSettings))
     println("*** producer finished.")
