@@ -37,7 +37,7 @@ object App extends EmbeddedKafka {
 
     println("*** producer producing records ...")
     Source(0 to 9)
-      .map(integer => new ProducerRecord[String, String](conf.topic, integer, integer.toString, (integer + 1).toString ))
+      .map(integer => new ProducerRecord[String, String](conf.topic, integer, integer.toString, integer.toString ))
       .runWith(Producer.plainSink(conf.producerSettings))
     println("*** producer finished.")
 
@@ -45,7 +45,7 @@ object App extends EmbeddedKafka {
     Consumer
       .plainSource(conf.consumerSettings, conf.subscription)
       .map { record =>
-        accumulator ! Add( record.partition, record.key, record.value.toIntOption.getOrElse(0) )
+        accumulator ! Add( record.partition, record.offset, record.key, record.value.toIntOption.getOrElse(0) )
         record
       }
       .runWith(Sink.ignore)
