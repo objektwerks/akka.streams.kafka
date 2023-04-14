@@ -41,7 +41,7 @@ object App extends EmbeddedKafka {
       .runWith(Producer.plainSink(conf.producerSettings))
     println("*** producer finished.")
 
-    println("*** consumer consuming records ...")
+    println(s"*** consumer consuming records from topic ${conf.topic} ...")
     Consumer
       .plainSource(conf.consumerSettings, conf.subscription)
       .map { record =>
