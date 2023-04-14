@@ -18,6 +18,7 @@ object App extends EmbeddedKafka {
     val conf = new Conf()
     val topic = conf.topic
     val partitions = conf.partitions
+    val parallelism = conf.parallelism
 
     implicit val kafkaConfig = EmbeddedKafkaConfig.defaultConfig
     val kafka = EmbeddedKafka.start()
@@ -36,16 +37,16 @@ object App extends EmbeddedKafka {
 
     println("*** akka system started")
 
-    println(s"*** producer producing records to topic: $topic ...")
+    println(s"*** producing records for topic: $topic ...")
     Source(0 until partitions)
       .map(integer => new ProducerRecord[String, String](topic, integer, integer.toString, integer.toString ))
       .runWith(Producer.plainSink(conf.producerSettings))
     println("*** producer finished.")
 
-    println(s"*** consumer consuming records from topic: $topic ...")
+    println(s"*** consuming records from topic: $topic with mapAsync parallelism set to: $parallelism ...")
     Consumer
       .plainSource(conf.consumerSettings, conf.subscription)
-      .mapAsync(conf.parallelism) { record =>
+      .mapAsync(parallelism) { record =>
         accumulator ! Add( record.partition, record.offset, record.key, record.value.toIntOption.getOrElse(0) )
         Future.unit
       }
