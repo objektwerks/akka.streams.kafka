@@ -27,6 +27,7 @@ object App extends EmbeddedKafka {
       partitions = partitions,
       replicationFactor = 1
     ): Unit
+    println(s"*** [ $topic ] topic created with #$partitions partions")
     println("*** embedded kafka started")
 
     implicit val system = ActorSystem.create("akka-streams-kafka", conf.config)
