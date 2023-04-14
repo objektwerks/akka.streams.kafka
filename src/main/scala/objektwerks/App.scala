@@ -15,6 +15,7 @@ import scala.language.postfixOps
 import akka.kafka.scaladsl.Committer
 
 import objektwerks.Add
+import scala.concurrent.Future
 object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
     val conf = new Conf()
@@ -45,11 +46,12 @@ object App extends EmbeddedKafka {
     println(s"*** consumer consuming records from topic: $topic ...")
     Consumer
       .plainSource(conf.consumerSettings, conf.subscription)
-      .map { record =>
+      .mapAsync(2) { record =>
         accumulator ! Add( record.partition, record.offset, record.key, record.value.toIntOption.getOrElse(0) )
-        record
+        Future.successful()
       }
-      .runWith(Sink.ignore)
+      .to(Sink.ignore)
+      .run()
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app.")
 
     StdIn.readLine()
