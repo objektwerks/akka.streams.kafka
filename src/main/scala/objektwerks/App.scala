@@ -2,7 +2,7 @@ package objektwerks
 
 import io.github.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 
-import akka.actor.{Actor, ActorSystem, Props}
+import akka.actor.{Actor, ActorSystem}
 import akka.kafka.scaladsl.{Producer, Transactional}
 import akka.stream.scaladsl.{Sink, Source}
 
