@@ -13,8 +13,8 @@ import scala.concurrent.duration._
 import scala.io.StdIn
 import scala.language.postfixOps
 
-object App extends EmbeddedKafka {
-  def main(args: Array[String]): Unit = {
+object App extends EmbeddedKafka:
+  def main(args: Array[String]): Unit =
     val conf = new Conf()
     val topic = conf.topic
     val partitions = conf.partitions
@@ -62,5 +62,3 @@ object App extends EmbeddedKafka {
     kafka.stop(true)
     println("*** embedded kafka stopped")
     println("*** see log at /target/app.log")
-  }
-}
