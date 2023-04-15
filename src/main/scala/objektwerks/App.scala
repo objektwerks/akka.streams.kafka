@@ -3,7 +3,7 @@ package objektwerks
 import io.github.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 
 import akka.actor.{Actor, ActorSystem, Props}
-import akka.kafka.scaladsl.{Consumer, Producer, Transactional}
+import akka.kafka.scaladsl.{Producer, Transactional}
 import akka.stream.scaladsl.{Sink, Source}
 
 import org.apache.kafka.clients.producer.ProducerRecord
