@@ -52,7 +52,7 @@ object App extends EmbeddedKafka {
           val offset = record.offset
           val key = record.key
           val value = record.value
-          println(s"*** accumulator > partition: $partition offset: $offset key: $key value: $value")        
+          println(s"*** partition: $partition offset: $offset key: $key value: $value")        
         }
       }
       .runWith(Sink.ignore)
