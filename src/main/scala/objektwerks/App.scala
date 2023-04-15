@@ -46,7 +46,7 @@ object App extends EmbeddedKafka {
     Transactional
       .source(conf.consumerSettings, conf.subscription)
       .mapAsync(parallelism) { message =>
-        Future {
+        Future { // simulate async io
           val record = message.record
           println(s"*** partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
         }
