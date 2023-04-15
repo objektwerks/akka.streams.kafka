@@ -33,7 +33,6 @@ object App extends EmbeddedKafka {
 
     implicit val system = ActorSystem.create("akka-streams-kafka", conf.config)
     implicit val dispatcher = system.dispatcher
-    val accumulator = system.actorOf(Props[Accumulator], "accumulator")
 
     println("*** akka system started")
 
