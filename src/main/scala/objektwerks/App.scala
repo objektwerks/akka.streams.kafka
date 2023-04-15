@@ -47,9 +47,14 @@ object App extends EmbeddedKafka {
     Transactional
       .source(conf.consumerSettings, conf.subscription)
       .mapAsync(parallelism) { message =>
-        val record = message.record
-        accumulator ! Add( record.partition, record.offset, record.key, record.value.toIntOption.getOrElse(0) )
-        Future.unit
+        Future {
+          val record = message.record
+          val partition = record.partition
+          val offset = record.offset
+          val key = record.key
+          val value = record.value
+          println(s"*** accumulator > partition: $partition offset: $offset key: $key value: $value")        
+        }
       }
       .runWith(Sink.ignore)
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app")
