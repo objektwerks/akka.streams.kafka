@@ -7,7 +7,7 @@ import com.typesafe.config.ConfigFactory
 import org.apache.kafka.clients.consumer.ConsumerConfig
 import org.apache.kafka.common.serialization.{StringDeserializer, StringSerializer}
 
-final class Conf {
+final class Conf:
   val config = ConfigFactory.load("app.conf")
   val partitions = config.getInt("kafka.partitions")
   val parallelism = Runtime.getRuntime.availableProcessors
@@ -35,4 +35,3 @@ final class Conf {
 
   val topic = config.getString("kafka.topic")
   val subscription = Subscriptions.topics(topic)
-}
