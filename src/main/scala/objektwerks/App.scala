@@ -48,11 +48,7 @@ object App extends EmbeddedKafka {
       .mapAsync(parallelism) { message =>
         Future {
           val record = message.record
-          val partition = record.partition
-          val offset = record.offset
-          val key = record.key
-          val value = record.value
-          println(s"*** partition: $partition offset: $offset key: $key value: $value")
+          println(s"*** partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
         }
       }
       .runWith(Sink.ignore)
