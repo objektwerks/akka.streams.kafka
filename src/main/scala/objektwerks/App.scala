@@ -8,7 +8,7 @@ import akka.stream.scaladsl.{Sink, Source}
 
 import org.apache.kafka.clients.producer.ProducerRecord
 
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.io.StdIn
 import scala.language.postfixOps
@@ -31,8 +31,8 @@ object App extends EmbeddedKafka:
     println(s"*** created topic: $topic with $partitions partitions")
     println("*** embedded kafka started")
 
-    implicit val system = ActorSystem.create("akka-streams-kafka", conf.config)
-    implicit val dispatcher = system.dispatcher
+    given system: ActorSystem = ActorSystem.create("akka-streams-kafka", conf.config)
+    given dispatcher: ExecutionContext = system.dispatcher
 
     println("*** akka system started")
 
