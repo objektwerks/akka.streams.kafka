@@ -13,7 +13,7 @@ import scala.concurrent.duration._
 import scala.io.StdIn
 import scala.language.postfixOps
 
-object App extends EmbeddedKafka:
+object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit =
     val conf = new Conf()
     val topic = conf.topic
@@ -31,8 +31,8 @@ object App extends EmbeddedKafka:
     println(s"*** created topic: $topic with $partitions partitions")
     println("*** embedded kafka started")
 
-    given system: ActorSystem = ActorSystem.create("akka-streams-kafka", conf.config)
-    given dispatcher: ExecutionContext = system.dispatcher
+    implicit val system: ActorSystem = ActorSystem.create("akka-streams-kafka", conf.config)
+    implicit val dispatcher: ExecutionContext = system.dispatcher
 
     println("*** akka system started")
 
@@ -62,3 +62,4 @@ object App extends EmbeddedKafka:
     kafka.stop(true)
     println("*** embedded kafka stopped")
     println("*** see log at /target/app.log")
+}
