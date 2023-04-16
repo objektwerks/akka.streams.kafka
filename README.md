@@ -6,7 +6,7 @@ Note
 ----
 >In this project, Akka and Akka Streams works with Scala 3. But in
 >my Akka Streams project (https://github.com/objektwerks/akka.streams)
->it does not.
+>it does not - in particular, with the GraphDSL.
 
 Run
 ---
