@@ -57,10 +57,11 @@ object App extends EmbeddedKafka {
     StdIn.readLine()
 
     Await.result(system.terminate(), 30 seconds)
-    println("*** akka system stopped")
+    println("*** akka system terminated")
 
     kafka.stop(true)
     println("*** embedded kafka stopped")
     println("*** see log at /target/app.log")
+    println("*** app shutdown")
   }
 }
