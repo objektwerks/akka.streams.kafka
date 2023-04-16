@@ -1,12 +1,6 @@
 Akka Streams Kafka
 ------------------
->Akka Streams and Alpakka Kafka Connector test app using Scala 3.
-
-Note
-----
->In this project, Akka and Akka Streams works with Scala 3. But in
->my Akka Streams project (https://github.com/objektwerks/akka.streams)
->it does not - in particular, with the GraphDSL.
+>Akka Streams and Alpakka Kafka Connector test app.
 
 Run
 ---
