@@ -2,7 +2,8 @@ package objektwerks
 
 import io.github.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 
-import akka.actor.ActorSystem
+import akka.actor.{Actor, ActorSystem, Props}
+import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import akka.kafka.scaladsl.{Producer, Transactional}
 import akka.stream.scaladsl.{Sink, Source}
 
@@ -12,6 +13,28 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.io.StdIn
 import scala.language.postfixOps
+
+final case class Work(partition: Int, offset: Long, key: String, value: String)
+
+class Manager extends Actor {
+  val router = {
+    val routees = Vector.fill(100) {
+      ActorRefRoutee( context.actorOf(Props[Worker]()) )
+    }
+    Router(RoundRobinRoutingLogic(), routees)
+  }
+
+  def receive: Receive = {
+    case work @ Work => router.route(work, sender())
+  }
+}
+
+class Worker extends Actor {
+  def receive: Receive = {
+    case Work(partition, offset, key, value) =>
+      println(s"*** partition: ${partition} offset: ${offset} key: ${key} value: ${value}")
+  }
+}
 
 object ActorRouterApp extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
