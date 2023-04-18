@@ -69,11 +69,9 @@ object ActorRouterApp extends EmbeddedKafka {
     println(s"*** consuming records from topic: $topic with mapAsync parallelism set to: $parallelism ...")
     Transactional
       .source(conf.consumerSettings, conf.subscription)
-      .mapAsync(parallelism) { message =>
-        Future { // simulate async io, optionally persist partitions and offsets
-          val record = message.record
-          println(s"*** partition: ${record.partition} offset: ${record.offset} key: ${record.key} value: ${record.value}")
-        }
+      .map { message =>
+        val record = message.record
+        manager ! Work(record.partition, record.offset, record.key, record.value)
       }
       .runWith(Sink.ignore)
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app")
