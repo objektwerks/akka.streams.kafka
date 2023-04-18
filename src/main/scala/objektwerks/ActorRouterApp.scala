@@ -41,7 +41,6 @@ object ActorRouterApp extends EmbeddedKafka {
     val conf = new Conf()
     val topic = conf.topic
     val partitions = conf.partitions
-    val parallelism = conf.parallelism
 
     implicit val kafkaConfig = EmbeddedKafkaConfig.defaultConfig
     val kafka = EmbeddedKafka.start()
@@ -66,7 +65,7 @@ object ActorRouterApp extends EmbeddedKafka {
       .runWith(Producer.plainSink(conf.producerSettings))
     println("*** producer finished")
 
-    println(s"*** consuming records from topic: $topic with actor routee parallelism set to: $parallelism ...")
+    println(s"*** consuming records from topic: $topic with actor routees set to: $partitions ...")
     Transactional
       .source(conf.consumerSettings, conf.subscription)
       .map { message =>
