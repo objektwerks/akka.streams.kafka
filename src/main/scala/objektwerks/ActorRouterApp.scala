@@ -74,7 +74,7 @@ object ActorRouterApp extends EmbeddedKafka {
     println(s"*** consuming records from topic: $topic with mapAsync parallelism set to: $parallelism with $partitions actor [worker] routees ...")
     Transactional
       .source(conf.consumerSettings, conf.subscription)
-      .mapAsyncUnordered(parallelism) { message =>
+      .mapAsync(parallelism) { message =>
         val record = message.record
         manager ! Work(record.partition, record.offset, record.key, record.value)
         Future.unit
