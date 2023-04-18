@@ -18,6 +18,7 @@ import scala.language.postfixOps
 import akka.util.Timeout
 
 final case class Work(partition: Int, offset: Long, key: String, value: String)
+final case class Processed(partition: Int, offset: Long, key: String, value: String)
 
 class Worker(partition: Int) extends Actor with ActorLogging {
   log.info(s"*** worker actor $partition intialized")
@@ -25,7 +26,7 @@ class Worker(partition: Int) extends Actor with ActorLogging {
   def receive: Receive = {
     case work @ Work(partition, offset, key, value) =>
       log.info(s"*** worker id: $partition partition: ${partition} offset: ${offset} key: ${key} value: ${value}")
-      sender.tell(work, context.parent)
+      sender.tell(Processed(work.partition, work.offset, work.key, work.value), context.parent)
   }
 }
 
@@ -40,6 +41,7 @@ class Manager(partitions: Int) extends Actor with ActorLogging {
 
   def receive: Receive = {
     case work @ Work => router.route(work, sender)
+    case processed @ Processed => context.parent ! processed
   }
 }
 
@@ -79,7 +81,7 @@ object ActorRouterApp extends EmbeddedKafka {
       .source(conf.consumerSettings, conf.subscription)
       .mapAsync(parallelism) { message =>
         val record = message.record
-        (manager.ask( Work(record.partition, record.offset, record.key, record.value) )).mapTo[Work]
+        (manager.ask( Work(record.partition, record.offset, record.key, record.value) )).mapTo[Processed]
       }
       .runWith(Sink.foreach(println))
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app")
