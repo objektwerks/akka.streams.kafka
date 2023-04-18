@@ -16,6 +16,13 @@ import scala.language.postfixOps
 
 final case class Work(partition: Int, offset: Long, key: String, value: String)
 
+class Worker extends Actor {
+  def receive: Receive = {
+    case Work(partition, offset, key, value) =>
+      println(s"*** partition: ${partition} offset: ${offset} key: ${key} value: ${value}")
+  }
+}
+
 class Manager extends Actor {
   val router = {
     val routees = Vector.fill(100) {
@@ -26,13 +33,6 @@ class Manager extends Actor {
 
   def receive: Receive = {
     case work @ Work => router.route(work, sender())
-  }
-}
-
-class Worker extends Actor {
-  def receive: Receive = {
-    case Work(partition, offset, key, value) =>
-      println(s"*** partition: ${partition} offset: ${offset} key: ${key} value: ${value}")
   }
 }
 
