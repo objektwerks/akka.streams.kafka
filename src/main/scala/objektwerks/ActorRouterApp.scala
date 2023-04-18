@@ -24,7 +24,6 @@ class Worker(partition: Int) extends Actor with ActorLogging {
 
   def receive: Receive = {
     case work @ Work(partition, offset, key, value) =>
-      println(s"*** worker id: $partition partition: ${partition} offset: ${offset} key: ${key} value: ${value}")
       log.info(s"*** worker id: $partition partition: ${partition} offset: ${offset} key: ${key} value: ${value}")
       sender.tell(work, context.parent)
   }
