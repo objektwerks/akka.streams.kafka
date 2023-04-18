@@ -6,8 +6,8 @@ Run
 ---
 1. sbt clean run
 >Multiple main classes detected. Select one to run:
-1. objektwerks.ActorRouterApp
-2. objektwerks.MapAsyncApp
+1. objektwerks.ActorApp
+2. objektwerks.App
 
 Resources
 ---------
