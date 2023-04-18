@@ -8,6 +8,7 @@ import akka.pattern.ask
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import akka.kafka.scaladsl.{Producer, Transactional}
 import akka.stream.scaladsl.{Sink, Source}
+import akka.util.Timeout
 
 import org.apache.kafka.clients.producer.ProducerRecord
 
@@ -15,7 +16,6 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.io.StdIn
 import scala.language.postfixOps
-import akka.util.Timeout
 
 final case class Work(partition: Int, offset: Long, key: String, value: String)
 final case class Processed(partition: Int, offset: Long, key: String, value: String)
