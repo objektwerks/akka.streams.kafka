@@ -40,8 +40,12 @@ class Manager(partitions: Int) extends Actor with ActorLogging {
   log.info("*** manager actor intialized")
 
   def receive: Receive = {
-    case work @ Work => router.route(work, sender)
-    case processed @ Processed => context.parent ! processed
+    case work @ Work =>
+      log.info(s"*** manager actor received work: $work")
+      router.route(work, sender)
+    case processed @ Processed =>
+      log.info(s"*** manager actor received processed: $processed")
+      context.parent ! processed
   }
 }
 
