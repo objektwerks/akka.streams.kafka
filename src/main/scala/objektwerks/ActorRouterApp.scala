@@ -4,7 +4,7 @@ import io.github.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
-import akka.kafka.scaladsl.{Consumer, Producer}
+import akka.kafka.scaladsl.{Producer, Transactional}
 import akka.stream.scaladsl.{Sink, Source}
 
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -46,6 +46,7 @@ object ActorRouterApp extends EmbeddedKafka {
     val conf = new Conf()
     val topic = conf.topic
     val partitions = conf.partitions
+    val parallelism = conf.parallelism
 
     implicit val kafkaConfig = EmbeddedKafkaConfig.defaultConfig
     val kafka = EmbeddedKafka.start()
@@ -70,11 +71,13 @@ object ActorRouterApp extends EmbeddedKafka {
       .runWith(Producer.plainSink(conf.producerSettings))
     println("*** producer finished")
 
-    println(s"*** consuming records from topic: $topic with $partitions actor [worker] routees ...")
-    Consumer
-      .plainSource(conf.consumerSettings, conf.subscription)
-      .map { record =>
+    println(s"*** consuming records from topic: $topic with mapAsync parallelism set to: $parallelism with $partitions actor [worker] routees ...")
+    Transactional
+      .source(conf.consumerSettings, conf.subscription)
+      .mapAsync(parallelism) { message =>
+        val record = message.record
         manager ! Work(record.partition, record.offset, record.key, record.value)
+        Future.unit
       }
       .runWith(Sink.ignore)
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app")
