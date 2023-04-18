@@ -20,7 +20,7 @@ import akka.util.Timeout
 final case class Work(partition: Int, offset: Long, key: String, value: String)
 final case class Processed(partition: Int, offset: Long, key: String, value: String)
 
-class Worker(partition: Int) extends Actor with ActorLogging {
+final class Worker(partition: Int) extends Actor with ActorLogging {
   log.info(s"*** worker actor $partition intialized")
 
   def receive: Receive = {
@@ -29,7 +29,7 @@ class Worker(partition: Int) extends Actor with ActorLogging {
   }
 }
 
-class Manager(partitions: Int) extends Actor with ActorLogging {
+final class Manager(partitions: Int) extends Actor with ActorLogging {
   val router = {
     val routees = (0 until partitions).map { partition =>
       ActorRefRoutee( context.actorOf(Props(classOf[Worker], partition), name = s"worker-$partition") )
