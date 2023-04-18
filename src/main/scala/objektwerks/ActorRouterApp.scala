@@ -4,7 +4,7 @@ import io.github.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
-import akka.kafka.scaladsl.{Producer, Transactional}
+import akka.kafka.scaladsl.{Consumer, Producer}
 import akka.stream.scaladsl.{Sink, Source}
 
 import org.apache.kafka.clients.producer.ProducerRecord
@@ -71,10 +71,9 @@ object ActorRouterApp extends EmbeddedKafka {
     println("*** producer finished")
 
     println(s"*** consuming records from topic: $topic with $partitions actor [worker] routees ...")
-    Transactional
-      .source(conf.consumerSettings, conf.subscription)
-      .map { message =>
-        val record = message.record
+    Consumer
+      .plainSource(conf.consumerSettings, conf.subscription)
+      .map { record =>
         manager ! Work(record.partition, record.offset, record.key, record.value)
       }
       .runWith(Sink.ignore)
