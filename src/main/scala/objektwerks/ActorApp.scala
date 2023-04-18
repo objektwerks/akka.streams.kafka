@@ -85,7 +85,7 @@ object ActorApp extends EmbeddedKafka {
         (manager ? Work(record.partition, record.offset, record.key, record.value) ).mapTo[Processed]
       }
       .map { processed =>
-        println(s"*** processed: $processed")
+        println(s"*** processed > partition: ${processed.partition} offset: ${processed.offset} key: ${processed.key} value: ${processed.value}")
       }
       .runWith(Sink.ignore)
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app")
