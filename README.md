@@ -1,6 +1,6 @@
 Akka Streams Kafka
 ------------------
->Akka Streams and Alpakka Kafka Connector test app.
+>Akka Streams and Alpakka Kafka Connector test apps ( 2 ).
 
 Run
 ---
