@@ -13,7 +13,7 @@ import scala.concurrent.duration._
 import scala.io.StdIn
 import scala.language.postfixOps
 
-object MapAsyncApp extends EmbeddedKafka {
+object App extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
     val conf = new Conf()
     val topic = conf.topic
