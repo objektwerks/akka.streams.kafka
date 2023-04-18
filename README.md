@@ -5,6 +5,9 @@ Akka Streams Kafka
 Run
 ---
 1. sbt clean run
+>Multiple main classes detected. Select one to run:
+1. objektwerks.ActorRouterApp
+2. objektwerks.MapAsyncApp
 
 Resources
 ---------
