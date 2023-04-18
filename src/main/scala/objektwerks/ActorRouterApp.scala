@@ -56,6 +56,7 @@ object ActorRouterApp extends EmbeddedKafka {
 
     implicit val system: ActorSystem = ActorSystem.create("akka-streams-kafka", conf.config)
     implicit val dispatcher: ExecutionContext = system.dispatcher
+    val manager = system.actorOf(Props[Manager](), name = "manager")
 
     println("*** akka system started")
 
