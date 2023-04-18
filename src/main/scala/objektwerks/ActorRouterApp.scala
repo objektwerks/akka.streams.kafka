@@ -65,7 +65,7 @@ object ActorRouterApp extends EmbeddedKafka {
       .runWith(Producer.plainSink(conf.producerSettings))
     println("*** producer finished")
 
-    println(s"*** consuming records from topic: $topic with actor routees set to: $partitions ...")
+    println(s"*** consuming records from topic: $topic with $partitions actor [worker] routees ...")
     Transactional
       .source(conf.consumerSettings, conf.subscription)
       .map { message =>
