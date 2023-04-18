@@ -26,7 +26,7 @@ class Worker(partition: Int) extends Actor with ActorLogging {
   def receive: Receive = {
     case work @ Work(partition, offset, key, value) =>
       log.info(s"*** worker id: $partition partition: ${partition} offset: ${offset} key: ${key} value: ${value}")
-      sender.tell(Processed(work.partition, work.offset, work.key, work.value), context.parent)
+      sender ! Processed(work.partition, work.offset, work.key, work.value)
   }
 }
 
@@ -81,7 +81,7 @@ object ActorRouterApp extends EmbeddedKafka {
       .source(conf.consumerSettings, conf.subscription)
       .mapAsync(parallelism) { message =>
         val record = message.record
-        (manager.ask( Work(record.partition, record.offset, record.key, record.value) )).mapTo[Processed]
+        (manager ? Work(record.partition, record.offset, record.key, record.value) ).mapTo[Processed]
       }
       .runWith(Sink.foreach(println))
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app")
