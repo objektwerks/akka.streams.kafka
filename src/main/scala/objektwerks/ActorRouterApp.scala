@@ -2,7 +2,9 @@ package objektwerks
 
 import io.github.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 
+import akka.Done
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
+import akka.pattern.ask
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import akka.kafka.scaladsl.{Producer, Transactional}
 import akka.stream.scaladsl.{Sink, Source}
@@ -13,6 +15,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.io.StdIn
 import scala.language.postfixOps
+import akka.util.Timeout
 
 final case class Work(partition: Int, offset: Long, key: String, value: String)
 
@@ -21,6 +24,7 @@ class Worker(partition: Int) extends Actor with ActorLogging {
 
   def receive: Receive = {
     case Work(partition, offset, key, value) =>
+      println(s"*** worker id: $partition partition: ${partition} offset: ${offset} key: ${key} value: ${value}")
       log.info(s"*** worker id: $partition partition: ${partition} offset: ${offset} key: ${key} value: ${value}")
   }
 }
@@ -36,8 +40,8 @@ class Manager(partitions: Int) extends Actor with ActorLogging {
 
   def receive: Receive = {
     case work @ Work =>
-      log.info(s"*** manager actor received: $work")
-      router.route(work, sender())
+      router.route(work, sender)
+      sender ! Done
   }
 }
 
@@ -72,12 +76,12 @@ object ActorRouterApp extends EmbeddedKafka {
     println("*** producer finished")
 
     println(s"*** consuming records from topic: $topic with mapAsync parallelism set to: $parallelism with $partitions actor [worker] routees ...")
+    implicit val askTimeout = Timeout(30 seconds)
     Transactional
       .source(conf.consumerSettings, conf.subscription)
       .mapAsync(parallelism) { message =>
         val record = message.record
-        manager ! Work(record.partition, record.offset, record.key, record.value)
-        Future.unit
+        (manager ? Work(record.partition, record.offset, record.key, record.value)).mapTo[Done]
       }
       .runWith(Sink.ignore)
     println(s"*** once consumer records have been printed, depress RETURN key to shutdown app")
