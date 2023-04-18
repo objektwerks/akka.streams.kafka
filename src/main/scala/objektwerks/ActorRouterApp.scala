@@ -23,9 +23,9 @@ class Worker extends Actor {
   }
 }
 
-class Manager extends Actor {
+class Manager(partitions: Int) extends Actor {
   val router = {
-    val routees = Vector.fill(100) {
+    val routees = Vector.fill(partitions) {
       ActorRefRoutee( context.actorOf(Props[Worker]()) )
     }
     Router(RoundRobinRoutingLogic(), routees)
@@ -55,7 +55,7 @@ object ActorRouterApp extends EmbeddedKafka {
 
     implicit val system: ActorSystem = ActorSystem.create("akka-streams-kafka", conf.config)
     implicit val dispatcher: ExecutionContext = system.dispatcher
-    val manager = system.actorOf(Props[Manager](), name = "manager")
+    val manager = system.actorOf(Props(classOf[Manager], partitions), name = "manager")
 
     println("*** akka system started")
 
