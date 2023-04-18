@@ -17,22 +17,27 @@ import scala.language.postfixOps
 final case class Work(partition: Int, offset: Long, key: String, value: String)
 
 class Worker(partition: Int) extends Actor with ActorLogging {
+  log.info(s"*** worker actor $partition intialized")
+
   def receive: Receive = {
     case Work(partition, offset, key, value) =>
       log.info(s"*** worker id: $partition partition: ${partition} offset: ${offset} key: ${key} value: ${value}")
   }
 }
 
-class Manager(partitions: Int) extends Actor {
+class Manager(partitions: Int) extends Actor with ActorLogging {
   val router = {
     val routees = (0 until partitions).map { partition =>
       ActorRefRoutee( context.actorOf(Props(classOf[Worker], partition), name = s"worker-$partition") )
     }
     Router(RoundRobinRoutingLogic(), routees)
   }
+  log.info("*** manager actor intialized")
 
   def receive: Receive = {
-    case work @ Work => router.route(work, sender())
+    case work @ Work =>
+      log.info(s"*** manager actor received: $work")
+      router.route(work, sender())
   }
 }
 
