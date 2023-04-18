@@ -16,17 +16,17 @@ import scala.language.postfixOps
 
 final case class Work(partition: Int, offset: Long, key: String, value: String)
 
-class Worker extends Actor {
+class Worker(partition: Int) extends Actor {
   def receive: Receive = {
     case Work(partition, offset, key, value) =>
-      println(s"*** partition: ${partition} offset: ${offset} key: ${key} value: ${value}")
+      println(s"*** worker id: $partition partition: ${partition} offset: ${offset} key: ${key} value: ${value}")
   }
 }
 
 class Manager(partitions: Int) extends Actor {
   val router = {
-    val routees = Vector.fill(partitions) {
-      ActorRefRoutee( context.actorOf(Props[Worker]()) )
+    val routees = (0 until partitions).map { partition =>
+      ActorRefRoutee( context.actorOf(Props(classOf[Worker], partition), name = s"worker-$partition") )
     }
     Router(RoundRobinRoutingLogic(), routees)
   }
