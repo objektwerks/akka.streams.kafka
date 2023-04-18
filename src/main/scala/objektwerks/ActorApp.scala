@@ -46,7 +46,7 @@ class Manager(partitions: Int) extends Actor with ActorLogging {
   }
 }
 
-object ActorRouterApp extends EmbeddedKafka {
+object ActorApp extends EmbeddedKafka {
   def main(args: Array[String]): Unit = {
     val conf = new Conf()
     val topic = conf.topic
