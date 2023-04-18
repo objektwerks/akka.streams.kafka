@@ -2,7 +2,7 @@ package objektwerks
 
 import io.github.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 
-import akka.actor.{Actor, ActorSystem, Props}
+import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import akka.kafka.scaladsl.{Producer, Transactional}
 import akka.stream.scaladsl.{Sink, Source}
@@ -16,10 +16,10 @@ import scala.language.postfixOps
 
 final case class Work(partition: Int, offset: Long, key: String, value: String)
 
-class Worker(partition: Int) extends Actor {
+class Worker(partition: Int) extends Actor with ActorLogging {
   def receive: Receive = {
     case Work(partition, offset, key, value) =>
-      println(s"*** worker id: $partition partition: ${partition} offset: ${offset} key: ${key} value: ${value}")
+      log.info(s"*** worker id: $partition partition: ${partition} offset: ${offset} key: ${key} value: ${value}")
   }
 }
 
