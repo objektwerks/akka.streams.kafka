@@ -66,7 +66,7 @@ object ActorRouterApp extends EmbeddedKafka {
       .runWith(Producer.plainSink(conf.producerSettings))
     println("*** producer finished")
 
-    println(s"*** consuming records from topic: $topic with mapAsync parallelism set to: $parallelism ...")
+    println(s"*** consuming records from topic: $topic with actor routee parallelism set to: $parallelism ...")
     Transactional
       .source(conf.consumerSettings, conf.subscription)
       .map { message =>
