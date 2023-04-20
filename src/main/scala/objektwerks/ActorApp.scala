@@ -86,7 +86,7 @@ object ActorApp extends EmbeddedKafka {
         println(s"*** processed > partition: ${processed.partition} offset: ${processed.offset} key: ${processed.key} value: ${processed.value}")
       }
       .runWith(Sink.ignore)
-    println(s"*** once consumer records have been printed, depress RETURN key to shutdown app")
+    println(s"*** once all consumer records have been printed, depress RETURN key to shutdown app")
 
     StdIn.readLine()
 
