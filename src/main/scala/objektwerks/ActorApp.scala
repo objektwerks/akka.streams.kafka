@@ -2,7 +2,6 @@ package objektwerks
 
 import io.github.embeddedkafka.{EmbeddedKafka, EmbeddedKafkaConfig}
 
-import akka.Done
 import akka.actor.{Actor, ActorLogging, ActorSystem, Props}
 import akka.pattern.ask
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
