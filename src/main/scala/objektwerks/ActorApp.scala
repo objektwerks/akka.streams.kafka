@@ -67,7 +67,6 @@ object ActorApp extends EmbeddedKafka {
     implicit val dispatcher: ExecutionContext = system.dispatcher
     implicit val timeout = Timeout(30 seconds)
     val manager = system.actorOf(Props(classOf[Manager], partitions), name = "manager")
-
     println("*** akka system started")
 
     println(s"*** producing records for topic: $topic ...")
