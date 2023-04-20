@@ -65,6 +65,7 @@ object ActorApp extends EmbeddedKafka {
 
     implicit val system: ActorSystem = ActorSystem.create("akka-streams-kafka", conf.config)
     implicit val dispatcher: ExecutionContext = system.dispatcher
+    implicit val timeout = Timeout(30 seconds)
     val manager = system.actorOf(Props(classOf[Manager], partitions), name = "manager")
 
     println("*** akka system started")
@@ -76,7 +77,6 @@ object ActorApp extends EmbeddedKafka {
     println("*** producer finished")
 
     println(s"*** consuming records from topic: $topic with mapAsync parallelism set to: $parallelism with $partitions actor [worker] routees ...")
-    implicit val askTimeout = Timeout(30 seconds)
     Transactional
       .source(conf.consumerSettings, conf.subscription)
       .mapAsync(parallelism) { message =>
