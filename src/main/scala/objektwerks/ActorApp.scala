@@ -45,7 +45,7 @@ final class Manager(partitions: Int) extends Actor with ActorLogging {
 
   def receive: Receive = {
     case work @ Work(partition, offset, key, value) =>
-      log.info(s"*** manager actor received work: $work")
+      log.info("*** manager actor received work: {}", work)
       router.route(work, sender)
       sender ! Processed(partition, offset, key, value)
   }
