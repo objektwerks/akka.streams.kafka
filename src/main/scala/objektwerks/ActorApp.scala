@@ -29,7 +29,8 @@ final class Worker(partition: Int) extends Actor with ActorLogging {
 
   def receive: Receive = {
     case work @ Work(partition, offset, key, value) => // Note worker name vis-a-vis id and partition in app.log!
-      log.info(s"*** name: ${context.self.path.name} id: $partition partition: ${partition} offset: ${offset} key: ${key} value: ${value}")
+      log.info("*** name: {} id: {} partition: {} offset: {} key: {} value: {}",
+               Array( context.self.path.name, partition, partition, offset, key, value ) )
   }
 }
 
