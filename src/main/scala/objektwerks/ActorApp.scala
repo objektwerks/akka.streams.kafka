@@ -19,6 +19,11 @@ import scala.language.postfixOps
 final case class Work(partition: Int, offset: Long, key: String, value: String)
 final case class Processed(partition: Int, offset: Long, key: String, value: String)
 
+/**
+  * WARNING: Don't use string interpolation in Akka Acotr logging!
+  * Doing so incurs a huge performance penalty! Use this technique:
+  * log.info("*** commment {}", message)
+  */
 final class Worker(partition: Int) extends Actor with ActorLogging {
   log.info(s"*** worker actor $partition intialized")
 
