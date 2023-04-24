@@ -20,7 +20,7 @@ final case class Work(partition: Int, offset: Long, key: String, value: String)
 final case class Processed(partition: Int, offset: Long, key: String, value: String)
 
 /**
-  * WARNING: Don't use string interpolation in Akka Acotr logging!
+  * WARNING: Don't use string interpolation in Akka Actor logging!
   * Doing so incurs a huge performance penalty! Use this technique:
   * log.info("*** commment {}", message)
   */
