@@ -25,7 +25,7 @@ final case class Processed(partition: Int, offset: Long, key: String, value: Str
   * log.info("*** commment {}", message)
   */
 final class Worker(partition: Int) extends Actor with ActorLogging {
-  log.info(s"*** worker actor $partition intialized")
+  log.info("*** worker actor {} intialized", partition)
 
   def receive: Receive = {
     case work @ Work(partition, offset, key, value) => // Note worker name vis-a-vis id and partition in app.log!
