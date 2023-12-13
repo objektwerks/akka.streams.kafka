@@ -9,7 +9,7 @@ libraryDependencies ++= {
     "com.typesafe.akka" %% "akka-stream" % akkaVersion,
     "com.typesafe.akka" %% "akka-slf4j" % akkaVersion,
     "com.typesafe.akka" %% "akka-stream-kafka" % "3.0.1", // Don't upgrade due to BUSL 1.1!
-    "io.github.embeddedkafka" %% "embedded-kafka" % "3.6.0",
+    "io.github.embeddedkafka" %% "embedded-kafka" % "3.6.1",
     "ch.qos.logback" % "logback-classic" % "1.4.14"
   )
 }
